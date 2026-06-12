@@ -1,6 +1,7 @@
 -- ════════════════════════════════════════════════════════════════════════
 --  pepvoga — Supabase setup (schema + demo data)
---  Run ONCE in the Supabase SQL editor on a fresh database.
+--  Paste into the Supabase SQL editor and Run. Safe to re-run — it drops &
+--  recreates the app's (demo-only) tables, then loads the demo data.
 --  Demo logins:  admin@pepvoga.com / admin1234 · dive@pepvoga.com / owner1234
 --                traveler@pepvoga.com / traveler1234
 --  To remove the demo data later (keeping the schema):
@@ -8,6 +9,10 @@
 --              "newsletter_signups" CASCADE;
 --     DELETE FROM "users" WHERE email LIKE '%@pepvoga.com';
 -- ════════════════════════════════════════════════════════════════════════
+
+-- ──────────── CLEAN SLATE (drops the app's demo tables only) ─────────────
+DROP TABLE IF EXISTS "payments","reviews","bookings","availability","saved_listings","listings","owners","sessions","accounts","verification_tokens","newsletter_signups","users" CASCADE;
+DROP TYPE IF EXISTS "Role","Space","ListingType","ListingStatus","OwnerStatus","PriceUnit","BookingStatus","PaymentStatus","ExperienceLevel" CASCADE;
 
 -- ─────────────────────────────── ENUMS ──────────────────────────────────
 CREATE TYPE "Role" AS ENUM ('USER', 'OWNER', 'ADMIN');
