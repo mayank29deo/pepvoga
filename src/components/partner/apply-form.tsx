@@ -78,8 +78,8 @@ export function PartnerApplyForm({ defaultEmail }: { defaultEmail: string }) {
               <div
                 className={cn(
                   "mx-auto flex h-6 w-6 items-center justify-center rounded-full border-2 text-[0.58rem] font-bold",
-                  status === "done" && "border-ink bg-ink text-white",
-                  status === "cur" && "border-ink text-ink",
+                  status === "done" && "border-accent bg-accent text-white",
+                  status === "cur" && "border-accent text-accent",
                   status === "todo" && "border-line text-light",
                 )}
               >
@@ -91,7 +91,7 @@ export function PartnerApplyForm({ defaultEmail }: { defaultEmail: string }) {
               <span
                 className={cn(
                   "absolute bottom-0 left-0 right-0 h-0.5 rounded",
-                  n <= step ? "bg-ink" : "bg-line2",
+                  n <= step ? "bg-accent" : "bg-line2",
                 )}
               />
             </div>
@@ -117,7 +117,7 @@ export function PartnerApplyForm({ defaultEmail }: { defaultEmail: string }) {
                 onClick={() => set("category", c.type)}
                 className={cn(
                   "flex items-start gap-3.5 rounded-xl border-2 p-4 text-left transition-colors",
-                  d.category === c.type ? "border-ink bg-bg" : "border-line2 hover:border-line",
+                  d.category === c.type ? "border-accent bg-accent-soft" : "border-line2 hover:border-line",
                 )}
               >
                 <span className="text-2xl">{c.icon}</span>
@@ -160,11 +160,11 @@ export function PartnerApplyForm({ defaultEmail }: { defaultEmail: string }) {
                   key={svc}
                   className={cn(
                     "flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2.5 text-xs transition-colors",
-                    d.services.includes(svc) ? "border-ink bg-bg" : "border-line2 hover:border-line",
+                    d.services.includes(svc) ? "border-accent bg-accent-soft" : "border-line2 hover:border-line",
                   )}
                 >
                   <input type="checkbox" name="services" value={svc} checked={d.services.includes(svc)} onChange={() => toggleSvc(svc)} className="sr-only" />
-                  <span className={cn("flex h-4 w-4 items-center justify-center rounded border", d.services.includes(svc) ? "border-ink bg-ink text-white" : "border-line")}>
+                  <span className={cn("flex h-4 w-4 items-center justify-center rounded border", d.services.includes(svc) ? "border-accent bg-accent text-white" : "border-line")}>
                     {d.services.includes(svc) && <Check size={11} />}
                   </span>
                   <span className="text-ink2">{svc}</span>
@@ -205,7 +205,7 @@ export function PartnerApplyForm({ defaultEmail }: { defaultEmail: string }) {
             <ReviewBlock title="Contact" rows={[["Email", d.contactEmail || "—"], ["Price range", d.priceRange || "—"]]} />
           </div>
           <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border-2 border-line2 p-4">
-            <span className={cn("mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border", terms ? "border-ink bg-ink text-white" : "border-line")}>
+            <span className={cn("mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border", terms ? "border-accent bg-accent text-white" : "border-line")}>
               {terms && <Check size={11} />}
             </span>
             <input type="checkbox" checked={terms} onChange={(e) => setTerms(e.target.checked)} className="sr-only" />

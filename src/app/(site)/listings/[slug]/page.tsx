@@ -59,7 +59,7 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
             )}
             {listing.ratingCount > 0 && (
               <span className="flex items-center gap-1 text-xs font-semibold text-ink">
-                <Star size={13} className="fill-ink" /> {listing.ratingAvg.toFixed(1)}
+                <Star size={13} className="fill-accent text-accent" /> {listing.ratingAvg.toFixed(1)}
                 <span className="font-normal text-light">({listing.ratingCount})</span>
               </span>
             )}
@@ -149,7 +149,7 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
                   <div key={r.id} className="rounded-2xl border border-line2 bg-white p-5">
                     <div className="flex items-center gap-1 text-ink">
                       {Array.from({ length: 5 }).map((_, i) => (
-                        <Star key={i} size={12} className={i < r.rating ? "fill-ink" : "text-light"} />
+                        <Star key={i} size={12} className={i < r.rating ? "fill-accent text-accent" : "text-light"} />
                       ))}
                     </div>
                     {r.title && <div className="mt-2 text-sm font-semibold text-ink">{r.title}</div>}

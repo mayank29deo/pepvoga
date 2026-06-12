@@ -30,7 +30,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
         </span>
         {listing.ratingCount > 0 && (
           <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-ink/70 px-2 py-1 text-[0.65rem] font-semibold text-white backdrop-blur-sm">
-            <Star size={11} className="fill-white" /> {listing.ratingAvg.toFixed(1)}
+            <Star size={11} className="fill-accent text-accent" /> {listing.ratingAvg.toFixed(1)}
           </span>
         )}
         <span className="absolute bottom-3 left-3 z-10 text-[0.7rem] text-white/80">

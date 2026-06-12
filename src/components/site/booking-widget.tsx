@@ -45,7 +45,7 @@ export function BookingWidget(props: {
         {Price}
         <Link
           href={`/login?next=/listings/${slug}`}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-ink py-3 text-sm font-semibold text-white transition-colors hover:bg-ink2"
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-accent py-3 text-sm font-semibold text-white transition-colors hover:bg-[#c64d22]"
         >
           Sign in to book <ArrowRight size={15} />
         </Link>
@@ -113,7 +113,7 @@ export function BookingWidget(props: {
       <button
         type="submit"
         disabled={pending || slots.length === 0}
-        className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-ink py-3 text-sm font-semibold text-white transition-colors hover:bg-ink2 disabled:opacity-50"
+        className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-accent py-3 text-sm font-semibold text-white transition-colors hover:bg-[#c64d22] disabled:opacity-50"
       >
         {pending ? "Requesting…" : "Request to book"} <ArrowRight size={15} />
       </button>

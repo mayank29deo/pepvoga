@@ -54,7 +54,7 @@ export function NewsletterForm({
         <button
           type="submit"
           disabled={pending}
-          className="flex items-center gap-1.5 bg-ink px-5 text-xs font-semibold text-white transition-colors hover:bg-ink2 disabled:opacity-60"
+          className="flex items-center gap-1.5 bg-accent px-5 text-xs font-semibold text-white transition-colors hover:bg-[#c64d22] disabled:opacity-60"
         >
           {pending ? "…" : "Join"} <ArrowRight size={14} />
         </button>

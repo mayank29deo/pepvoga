@@ -59,7 +59,7 @@ export function ListingForm({
               onClick={() => setType(t)}
               className={cn(
                 "rounded-xl border-2 px-4 py-3 text-left transition-colors",
-                type === t ? "border-ink bg-bg" : "border-line2 hover:border-line",
+                type === t ? "border-accent bg-accent-soft" : "border-line2 hover:border-line",
               )}
             >
               <span className="block font-display text-sm font-bold text-ink">

@@ -20,6 +20,10 @@
   --color-approved: #166534;
   --color-review: #9a3412;
 
+  /* signature accent — a warm sunset orange, used sparingly over the B&W base */
+  --color-accent: #e0592a;
+  --color-accent-soft: #fbe9e1;
+
   /* fonts — wired to next/font CSS vars in layout.tsx */
   --font-display: var(--font-sora), "Sora", ui-sans-serif, sans-serif;
   --font-sans: var(--font-dmsans), "DM Sans", ui-sans-serif, sans-serif;
@@ -137,7 +141,7 @@ body {
     content: "";
     width: 18px;
     height: 1.5px;
-    background: var(--color-light);
+    background: var(--color-accent);
   }
 }
 

@@ -41,7 +41,7 @@ export function Navbar({ user }: { user: NavUser }) {
                   href={l.href}
                   className={cn(
                     "text-xs font-medium transition-colors hover:text-ink",
-                    active ? "text-ink" : "text-mid",
+                    active ? "text-accent" : "text-mid",
                   )}
                 >
                   {l.label}

@@ -23,7 +23,7 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
       <div className="flex items-center gap-0.5">
         {[1, 2, 3, 4, 5].map((n) => (
           <button key={n} type="button" onClick={() => setRating(n)} aria-label={`${n} stars`}>
-            <Star size={17} className={n <= rating ? "fill-ink text-ink" : "text-light"} />
+            <Star size={17} className={n <= rating ? "fill-accent text-accent" : "text-light"} />
           </button>
         ))}
       </div>

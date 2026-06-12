@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-type Variant = "dark" | "outline" | "white" | "ghost";
+type Variant = "dark" | "outline" | "white" | "ghost" | "accent";
 type Size = "sm" | "md" | "lg";
 
 const base =
@@ -17,6 +17,7 @@ const variants: Record<Variant, string> = {
   outline: "border border-line text-ink2 hover:border-ink hover:text-ink",
   white: "bg-white text-ink hover:bg-bg font-semibold shadow-card",
   ghost: "text-ink2 hover:bg-bg2",
+  accent: "bg-accent text-white font-semibold hover:bg-[#c64d22]",
 };
 
 export function buttonClasses(

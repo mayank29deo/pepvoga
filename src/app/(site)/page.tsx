@@ -34,7 +34,7 @@ export default function HomePage() {
         <Photo src={HERO} alt="Mountain landscape at altitude" priority />
         <div className="ov-soft" />
         <div className="absolute left-6 top-24 z-10 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[0.7rem] font-medium tracking-wide text-white/80 backdrop-blur-md sm:left-12">
-          ★ A marketplace for the untamed
+          <span className="text-accent">★</span> A marketplace for the untamed
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-[1400px]">
@@ -52,7 +52,7 @@ export default function HomePage() {
             </Reveal>
             <Reveal delay={220}>
               <div className="flex flex-col items-start gap-2.5 sm:items-end">
-                <Link href="/stays" className={buttonClasses("white", "md")}>
+                <Link href="/stays" className={buttonClasses("accent", "md")}>
                   Explore Stays <ArrowRight size={15} />
                 </Link>
                 <Link
@@ -139,7 +139,7 @@ export default function HomePage() {
           <div className="label-tag mb-4">Our manifesto</div>
           <p className="font-display text-[clamp(1.4rem,2.4vw,2.2rem)] font-light leading-snug text-ink2">
             “The best stories are never told from a desk.{" "}
-            <em className="italic text-ink">Go find yours.</em>”
+            <em className="italic text-accent">Go find yours.</em>”
           </p>
         </Reveal>
         <Reveal delay={120}>
