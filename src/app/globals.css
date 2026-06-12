@@ -1,0 +1,179 @@
+@import "tailwindcss";
+
+/* ───────────────────────── Design tokens (ported from prototype) ───────── */
+@theme {
+  /* surfaces */
+  --color-bg: #f6f3ed;
+  --color-bg2: #eeebe3;
+  --color-bg3: #e5e2da;
+  --color-paper: #ffffff;
+  /* ink / text */
+  --color-ink: #1a1917;
+  --color-ink2: #3b3a36;
+  --color-mid: #7c7b76;
+  --color-light: #b8b5ae;
+  /* hairlines */
+  --color-line: rgba(26, 25, 23, 0.1);
+  --color-line2: rgba(26, 25, 23, 0.06);
+  /* status accents */
+  --color-pending: #b45309;
+  --color-approved: #166534;
+  --color-review: #9a3412;
+
+  /* fonts — wired to next/font CSS vars in layout.tsx */
+  --font-display: var(--font-sora), "Sora", ui-sans-serif, sans-serif;
+  --font-sans: var(--font-dmsans), "DM Sans", ui-sans-serif, sans-serif;
+
+  /* shadows */
+  --shadow-card: 0 2px 20px rgba(26, 25, 23, 0.07);
+  --shadow-float: 0 8px 40px rgba(26, 25, 23, 0.1);
+
+  /* motion */
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink2);
+  font-family: var(--font-sans);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 99px;
+}
+::selection {
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
+
+/* ─────────────────── Signature components ─────────────────── */
+@layer components {
+  /* Warm black-and-white photo treatment with grain + overlays */
+  .photo-frame {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .photo-frame img {
+    object-fit: cover;
+    filter: grayscale(100%) contrast(1.18) brightness(0.85);
+    transition: transform 1.2s var(--ease-soft);
+  }
+  .group:hover .photo-frame img {
+    transform: scale(1.045);
+  }
+  .photo-grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+  }
+  .ov-bottom {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to top,
+      rgba(26, 25, 23, 0.82) 0%,
+      rgba(26, 25, 23, 0.2) 50%,
+      transparent 100%
+    );
+  }
+  .ov-soft {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      rgba(26, 25, 23, 0.35) 0%,
+      rgba(26, 25, 23, 0.12) 40%,
+      rgba(26, 25, 23, 0.6) 100%
+    );
+  }
+  .ov-left {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to right,
+      rgba(26, 25, 23, 0.75) 0%,
+      rgba(26, 25, 23, 0.15) 100%
+    );
+  }
+  .ov-dark {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: rgba(26, 25, 23, 0.5);
+  }
+
+  .label-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-mid);
+  }
+  .label-tag::before {
+    content: "";
+    width: 18px;
+    height: 1.5px;
+    background: var(--color-light);
+  }
+}
+
+/* ─────────────────── Animations ─────────────────── */
+@keyframes tick {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-tick {
+  display: inline-flex;
+  animation: tick 36s linear infinite;
+}
+
+@keyframes scrollPulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Reveal-on-scroll (driven by Reveal client component) */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.6s var(--ease-soft),
+    transform 0.6s var(--ease-soft);
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}

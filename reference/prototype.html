@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>pepvoga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f3ed;
+  --bg2:#eeebe3;
+  --bg3:#e5e2da;
+  --white:#ffffff;
+  --ink:#1a1917;
+  --ink2:#3b3a36;
+  --mid:#7c7b76;
+  --light:#b8b5ae;
+  --border:rgba(26,25,23,.1);
+  --border2:rgba(26,25,23,.06);
+  --shadow:0 2px 20px rgba(26,25,23,.07);
+  --shadow2:0 8px 40px rgba(26,25,23,.1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink2);font-family:'DM Sans',sans-serif;font-weight:400;overflow-x:hidden;cursor:none;}
+a{color:inherit;text-decoration:none;}
+input,textarea,select{font-family:'DM Sans',sans-serif;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);}
+
+/* CURSOR */
+.cur{position:fixed;width:8px;height:8px;background:var(--ink);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s;}
+.cur.big{width:36px;height:36px;background:transparent;border:1.5px solid var(--ink);}
+
+/* PHOTO TREATMENT — clean B&W on light backgrounds */
+.photo-wrap{position:absolute;inset:0;overflow:hidden;}
+.photo-wrap img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%) contrast(1.18) brightness(.85);transition:transform 7s ease;}
+.sp-photo .photo-wrap img{filter:grayscale(100%) contrast(1.3) brightness(.75);}
+.photo-wrap.zoom img{transform:scale(1.05);}
+/* grain */
+.photo-wrap::after{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");pointer-events:none;}
+.ov-bottom{position:absolute;inset:0;background:linear-gradient(to top,rgba(26,25,23,.82) 0%,rgba(26,25,23,.2) 50%,transparent 100%);pointer-events:none;}
+.ov-dark{position:absolute;inset:0;background:rgba(26,25,23,.5);pointer-events:none;}
+.ov-left{position:absolute;inset:0;background:linear-gradient(to right,rgba(26,25,23,.75) 0%,rgba(26,25,23,.15) 100%);pointer-events:none;}
+.ov-soft{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(26,25,23,.35) 0%,rgba(26,25,23,.12) 40%,rgba(26,25,23,.6) 100%);pointer-events:none;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content:space-between;align-items:center;padding:0 48px;height:62px;background:rgba(246,243,237,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border2);}
+.nav-logo{font-family:'Sora',sans-serif;font-weight:800;font-size:.95rem;letter-spacing:-.03em;color:var(--ink);cursor:pointer;}
+.nav-links{display:flex;gap:32px;list-style:none;}
+.nav-links span{font-size:.75rem;font-weight:500;letter-spacing:.01em;color:var(--mid);cursor:pointer;transition:color .2s;}
+.nav-links span:hover{color:var(--ink);}
+.nav-right{display:flex;gap:8px;align-items:center;}
+.nav-partner{font-size:.72rem;font-weight:500;color:var(--mid);cursor:pointer;transition:color .2s;padding:0 4px;}
+.nav-partner:hover{color:var(--ink);}
+.nav-admin{font-size:.7rem;font-weight:500;background:var(--bg3);color:var(--mid);padding:7px 14px;cursor:pointer;transition:background .2s;border-radius:6px;}
+.nav-admin:hover{background:var(--bg2);color:var(--ink);}
+.nav-cta{font-size:.75rem;font-weight:600;background:var(--ink);color:var(--white);padding:8px 20px;cursor:pointer;border-radius:6px;transition:background .2s;}
+.nav-cta:hover{background:var(--ink2);}
+
+/* PAGES */
+.page{display:none;min-height:100vh;padding-top:62px;}
+.page.active{display:block;}
+
+/* SHARED */
+.label-tag{font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.label-tag::before{content:'';width:18px;height:1.5px;background:var(--light);}
+.display{font-family:'Sora',sans-serif;font-weight:800;line-height:.9;letter-spacing:-.04em;}
+.heading{font-family:'Sora',sans-serif;font-weight:700;line-height:1.1;letter-spacing:-.03em;}
+.body-text{font-size:.9rem;line-height:1.85;color:var(--mid);}
+.btn-dark{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--white);font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;padding:12px 24px;border-radius:8px;cursor:pointer;border:none;transition:background .2s,transform .15s;}
+.btn-dark:hover{background:var(--ink2);transform:translateY(-1px);}
+.btn-outline{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--border);color:var(--ink2);font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;padding:11px 22px;border-radius:8px;cursor:pointer;background:none;transition:border-color .2s,color .2s;}
+.btn-outline:hover{border-color:var(--ink);color:var(--ink);}
+.btn-white{display:inline-flex;align-items:center;gap:8px;background:var(--white);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;padding:12px 24px;border-radius:8px;cursor:pointer;border:none;transition:background .2s;}
+.btn-white:hover{background:var(--bg);}
+.card{background:var(--white);border-radius:16px;box-shadow:var(--shadow);}
+.rv{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;}
+.rv.in{opacity:1;transform:translateY(0);}
+.rv.d1{transition-delay:.1s;}.rv.d2{transition-delay:.2s;}.rv.d3{transition-delay:.3s;}
+
+/* ════ HOME HERO ════ */
+#home-hero{min-height:100vh;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:80px 56px 72px;}
+.hero-hl{position:relative;z-index:2;font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(4rem,11vw,12rem);line-height:.88;letter-spacing:-.05em;color:var(--white);}
+.hero-hl .stroke{-webkit-text-stroke:1.5px rgba(255,255,255,.7);color:transparent;}
+.hero-foot{position:relative;z-index:2;margin-top:40px;display:flex;justify-content:space-between;align-items:flex-end;gap:32px;}
+.hero-sub{font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:300;line-height:1.65;max-width:380px;color:rgba(255,255,255,.8);}
+.hero-tag-pill{position:absolute;top:100px;left:56px;z-index:2;background:rgba(255,255,255,.12);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.2);padding:7px 16px;border-radius:100px;font-size:.7rem;font-weight:500;color:rgba(255,255,255,.8);letter-spacing:.04em;}
+.hero-coord{position:absolute;bottom:80px;right:60px;z-index:2;text-align:right;}
+.hero-coord span{display:block;font-size:.58rem;letter-spacing:.16em;color:rgba(255,255,255,.4);line-height:1.8;}
+.hero-scroll{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.hero-scroll span{font-size:.6rem;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase;}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,rgba(255,255,255,.4),transparent);animation:scrollPulse 2s ease-in-out infinite;}
+@keyframes scrollPulse{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* TICKER */
+.ticker{overflow:hidden;padding:14px 0;background:var(--white);border-bottom:1px solid var(--border2);}
+.ticker-track{display:inline-flex;animation:tick 36s linear infinite;}
+.ticker-track span{font-size:.7rem;font-weight:500;letter-spacing:.06em;color:var(--mid);padding:0 24px;}
+.ticker-track .sep{color:var(--light);padding:0;}
+@keyframes tick{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* DESTINATION PINS */
+.pins-row{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border2);background:var(--white);}
+.pins-row::-webkit-scrollbar{display:none;}
+.pin-item{flex-shrink:0;padding:14px 28px;border-right:1px solid var(--border2);display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .2s;}
+.pin-item:hover{background:var(--bg);}
+.pin-dot{width:7px;height:7px;border-radius:50%;background:var(--ink);opacity:.25;flex-shrink:0;}
+.pin-name{font-size:.75rem;font-weight:600;color:var(--ink2);}
+.pin-dist{font-size:.65rem;color:var(--light);margin-top:1px;}
+
+/* SPLIT CARDS */
+.home-split{display:grid;grid-template-columns:1fr 1fr;}
+.split-card{min-height:500px;position:relative;overflow:hidden;cursor:pointer;}
+.split-card-inner{position:relative;z-index:2;padding:48px 44px;display:flex;flex-direction:column;justify-content:flex-end;height:100%;min-height:500px;}
+.split-card:hover .photo-wrap img{transform:scale(1.04);}
+.split-num{font-family:'Sora',sans-serif;font-weight:800;font-size:5rem;color:rgba(255,255,255,.08);line-height:1;margin-bottom:auto;}
+.split-title{font-family:'Sora',sans-serif;font-weight:700;font-size:1.8rem;letter-spacing:-.03em;color:var(--white);margin-bottom:10px;}
+.split-desc{font-size:.82rem;line-height:1.75;color:rgba(255,255,255,.65);max-width:340px;}
+.split-cta{margin-top:20px;display:inline-flex;align-items:center;gap:6px;font-size:.75rem;font-weight:600;color:var(--white);border-bottom:1px solid rgba(255,255,255,.3);padding-bottom:3px;transition:border-color .2s;}
+.split-card:hover .split-cta{border-color:rgba(255,255,255,.7);}
+.split-divider{width:1px;background:rgba(255,255,255,.15);}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);background:var(--white);border-bottom:1px solid var(--border2);}
+.stat-box{padding:36px 40px;border-right:1px solid var(--border2);}
+.stat-box:last-child{border-right:none;}
+.stat-num{font-family:'Sora',sans-serif;font-weight:800;font-size:2.2rem;letter-spacing:-.04em;color:var(--ink);display:block;margin-bottom:4px;}
+.stat-lbl{font-size:.7rem;font-weight:500;color:var(--light);letter-spacing:.06em;text-transform:uppercase;}
+
+/* QUOTE STRIP */
+.quote-strip{padding:80px 56px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;background:var(--white);}
+.quote-text{font-family:'Sora',sans-serif;font-weight:300;font-size:clamp(1.4rem,2.4vw,2.2rem);line-height:1.4;color:var(--ink2);}
+.quote-text em{font-style:italic;color:var(--ink);}
+.quote-right p{font-size:.88rem;line-height:1.85;color:var(--mid);margin-bottom:16px;}
+
+/* PHOTO MOSAIC */
+.mosaic{display:grid;grid-template-columns:1.4fr 1fr 1fr;grid-template-rows:280px 280px;background:var(--bg);}
+.mosaic-cell{position:relative;overflow:hidden;}
+.mosaic-cell:nth-child(1){grid-row:span 2;}
+.mosaic-cell img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%) contrast(1.15) brightness(.85);transition:transform .6s ease;}
+.mosaic-cell:hover img{transform:scale(1.05);}
+.mosaic-lbl{position:absolute;bottom:14px;left:14px;z-index:2;font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);background:rgba(26,25,23,.35);padding:4px 10px;border-radius:100px;backdrop-filter:blur(4px);}
+.mosaic-gap{background:var(--bg);width:2px;}
+
+/* PARTNER CALLOUT */
+.partner-band{padding:56px;display:flex;justify-content:space-between;align-items:center;gap:40px;background:var(--ink);border-radius:0;}
+.pb-left .pb-title{font-family:'Sora',sans-serif;font-weight:700;font-size:1.2rem;color:var(--white);margin-bottom:6px;}
+.pb-left p{font-size:.82rem;color:rgba(255,255,255,.55);max-width:480px;line-height:1.7;}
+.pb-tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px;}
+.pb-tag{font-size:.65rem;font-weight:500;border:1px solid rgba(255,255,255,.15);padding:4px 12px;border-radius:100px;color:rgba(255,255,255,.5);}
+
+/* JOIN */
+.join-section{display:grid;grid-template-columns:1fr 1fr;}
+.join-left{padding:80px 56px;background:var(--ink);color:var(--white);}
+.join-left .label-tag{color:rgba(255,255,255,.4);}
+.join-left .label-tag::before{background:rgba(255,255,255,.2);}
+.join-right{padding:80px 56px;background:var(--white);}
+.join-title{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(2.4rem,4vw,3.8rem);letter-spacing:-.05em;line-height:.9;margin-bottom:20px;}
+.join-sub{font-size:.88rem;line-height:1.8;color:rgba(255,255,255,.55);max-width:300px;}
+.jf-label{font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mid);margin-bottom:12px;}
+.jf-wrap{display:flex;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;}
+.j-inp{flex:1;background:none;border:none;padding:13px 18px;font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--ink);outline:none;}
+.j-inp::placeholder{color:var(--light);}
+.j-sub{background:var(--ink);color:var(--white);border:none;padding:13px 20px;font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;transition:background .2s;white-space:nowrap;}
+.j-sub:hover{background:var(--ink2);}
+.j-note{font-size:.7rem;color:var(--light);}
+.j-perks{list-style:none;margin-top:32px;padding-top:24px;border-top:1px solid var(--border2);}
+.j-perks li{padding:10px 0;border-bottom:1px solid var(--border2);font-size:.8rem;color:var(--ink2);display:flex;align-items:center;gap:10px;}
+.j-perks li::before{content:'→';color:var(--light);font-size:.75rem;}
+
+/* ════ SPACES ════ */
+.page-hero{padding:72px 56px 56px;border-bottom:1px solid var(--border2);background:var(--white);display:flex;justify-content:space-between;align-items:flex-end;}
+.page-hero-sub{font-size:.9rem;line-height:1.8;color:var(--mid);max-width:280px;font-style:italic;font-family:'DM Sans',sans-serif;}
+.spaces-grid{display:grid;grid-template-columns:repeat(3,1fr);}
+.space-card{min-height:500px;position:relative;overflow:hidden;cursor:pointer;border-right:1px solid var(--border2);}
+.space-card:last-child{border-right:none;}
+.space-card-body{position:relative;z-index:2;padding:36px;display:flex;flex-direction:column;justify-content:flex-end;height:100%;min-height:500px;}
+.space-card:hover .photo-wrap img{transform:scale(1.04);}
+.sc-label{font-size:.62rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:8px;}
+.sc-title{font-family:'Sora',sans-serif;font-weight:700;font-size:1.3rem;letter-spacing:-.02em;color:var(--white);margin-bottom:8px;line-height:1.2;}
+.sc-desc{font-size:.78rem;line-height:1.75;color:rgba(255,255,255,.6);}
+.sc-tag{margin-top:14px;display:inline-block;font-size:.62rem;font-weight:500;letter-spacing:.06em;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.2);padding:4px 12px;border-radius:100px;transition:all .2s;}
+.space-card:hover .sc-tag{border-color:rgba(255,255,255,.5);color:rgba(255,255,255,.8);}
+.sc-enter{margin-top:10px;font-size:.7rem;font-weight:600;color:rgba(255,255,255,.5);display:inline-flex;align-items:center;gap:5px;transition:color .2s;}
+.space-card:hover .sc-enter{color:var(--white);}
+
+/* SPACE DETAIL */
+.sd-hero{position:relative;min-height:520px;display:flex;align-items:flex-end;border-bottom:1px solid var(--border2);}
+.sd-content{position:relative;z-index:2;padding:68px 56px;display:grid;grid-template-columns:1fr 1fr;gap:60px;width:100%;align-items:flex-end;}
+.sd-title{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(2.8rem,7vw,7rem);line-height:.88;letter-spacing:-.05em;color:var(--white);margin-bottom:16px;}
+.sd-sub{font-size:1rem;font-style:italic;line-height:1.65;color:rgba(255,255,255,.65);}
+.sd-rp{font-size:.8rem;line-height:1.9;color:rgba(255,255,255,.55);margin-bottom:14px;}
+.sd-attrs{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.1);margin-top:24px;border-radius:10px;overflow:hidden;}
+.sd-attr{background:rgba(26,25,23,.5);padding:16px 20px;backdrop-filter:blur(8px);}
+.sd-attr-k{font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px;}
+.sd-attr-v{font-size:.78rem;color:rgba(255,255,255,.7);}
+.sport-grid{display:grid;grid-template-columns:repeat(4,1fr);}
+.sport-item{padding:28px;border-right:1px solid var(--border2);cursor:pointer;transition:background .2s;}
+.sport-item:last-child{border-right:none;}
+.sport-item:hover{background:var(--bg);}
+.si-icon{font-size:1.4rem;margin-bottom:10px;filter:grayscale(1);}
+.sport-item:hover .si-icon{filter:grayscale(0);}
+.si-name{font-family:'Sora',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:-.01em;margin-bottom:4px;}
+.si-desc{font-size:.7rem;line-height:1.6;color:var(--light);}
+
+/* ════ EXPERIENCES ════ */
+.exp-banner{position:relative;min-height:320px;display:flex;align-items:flex-end;border-bottom:1px solid var(--border2);}
+.exp-banner-content{position:relative;z-index:2;padding:64px 56px;display:flex;justify-content:space-between;align-items:flex-end;width:100%;}
+.sport-tabs{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border2);background:var(--white);}
+.sport-tabs::-webkit-scrollbar{display:none;}
+.tab{flex-shrink:0;padding:16px 28px;font-size:.75rem;font-weight:600;cursor:pointer;border-right:1px solid var(--border2);color:var(--mid);transition:color .2s,background .2s;position:relative;}
+.tab:hover{color:var(--ink);background:var(--bg);}
+.tab.active{color:var(--ink);background:var(--white);}
+.tab.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--ink);}
+.sp{display:none;}.sp.active{display:block;}
+.sp-hero{display:grid;grid-template-columns:1.1fr 1fr;}
+/* Sport panel overlay - stronger fade from bottom, minimal at top so action shows */
+.sp-photo .ov-bottom{background:linear-gradient(to top,rgba(26,25,23,.96) 0%,rgba(26,25,23,.5) 35%,rgba(26,25,23,.1) 65%,transparent 100%)!important;}
+.sp-photo{position:relative;min-height:580px;overflow:hidden;}
+.sp-photo-content{position:relative;z-index:2;padding:52px 48px;display:flex;flex-direction:column;justify-content:flex-end;height:100%;}
+.sp-photo:hover .photo-wrap img{transform:scale(1.03);}
+.sp-passport{position:absolute;top:24px;right:24px;z-index:3;padding:8px 14px;border:1.5px solid rgba(255,255,255,.2);border-radius:8px;text-align:center;transform:rotate(-3deg);background:rgba(26,25,23,.2);backdrop-filter:blur(8px);}
+.sp-pass-t{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);}
+.sp-pass-loc{font-size:.55rem;letter-spacing:.12em;color:rgba(255,255,255,.4);margin-top:2px;}
+.sp-icon{font-size:2.8rem;filter:grayscale(1);margin-bottom:14px;display:block;}
+.sp-title{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(2.4rem,4vw,4.5rem);letter-spacing:-.05em;line-height:.88;color:var(--white);margin-bottom:12px;}
+.sp-tagline{font-size:.9rem;font-style:italic;color:rgba(255,255,255,.65);line-height:1.55;margin-bottom:22px;}
+.sp-info{background:var(--white);}
+.sp-det{padding:32px 40px;border-bottom:1px solid var(--border2);}
+.sp-det:last-child{border-bottom:none;}
+.det-k{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--light);margin-bottom:8px;}
+.det-v{font-size:.82rem;line-height:1.8;color:var(--ink2);}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.pill{font-size:.65rem;font-weight:500;border:1.5px solid var(--border);padding:3px 10px;border-radius:100px;color:var(--ink2);}
+.sub-strip{display:grid;grid-template-columns:repeat(4,1fr);background:var(--bg);}
+.sub-c{padding:28px 24px;border-right:1px solid var(--border2);cursor:pointer;transition:background .2s;background:var(--white);}
+.sub-c:last-child{border-right:none;}
+.sub-c:hover{background:var(--bg);}
+.sub-ic{font-size:1.3rem;margin-bottom:10px;filter:grayscale(1);}
+.sub-c:hover .sub-ic{filter:grayscale(0);}
+.sub-n{font-family:'Sora',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:-.01em;margin-bottom:5px;}
+.sub-d{font-size:.72rem;line-height:1.65;color:var(--mid);}
+.oth-bar{padding:28px 40px;border-bottom:1px solid var(--border2);background:var(--white);display:flex;align-items:center;gap:14px;}
+.oth-t{font-family:'Sora',sans-serif;font-weight:700;font-size:.85rem;color:var(--ink);}
+.oth-c{font-size:.72rem;color:var(--light);}
+.oth-grid{display:grid;grid-template-columns:repeat(6,1fr);background:var(--white);}
+.oth-item{padding:24px 18px;border-right:1px solid var(--border2);border-bottom:1px solid var(--border2);text-align:center;cursor:pointer;transition:background .2s;}
+.oth-item:hover{background:var(--bg);}
+.oth-icon{font-size:1.4rem;margin-bottom:6px;filter:grayscale(1);}
+.oth-item:hover .oth-icon{filter:grayscale(0);}
+.oth-name{font-size:.62rem;font-weight:600;letter-spacing:.04em;color:var(--mid);}
+
+/* ════ COMMUNITY ════ */
+.comm-banner{position:relative;min-height:580px;border-bottom:1px solid var(--border2);}
+.comm-content{position:relative;z-index:2;padding:68px 56px;display:grid;grid-template-columns:1.1fr 1fr;gap:72px;min-height:580px;align-items:center;}
+.comm-title{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(2.6rem,5vw,5rem);letter-spacing:-.05em;line-height:.9;color:var(--white);margin-bottom:16px;}
+.comm-sub{font-size:.88rem;line-height:1.85;color:rgba(255,255,255,.6);max-width:360px;margin-bottom:28px;}
+.avatar-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:28px;}
+.av{aspect-ratio:1;background:rgba(255,255,255,.08);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;filter:grayscale(1);transition:all .25s;cursor:pointer;}
+.av:hover{filter:grayscale(0);background:rgba(255,255,255,.15);transform:scale(1.07);}
+.comm-right p{font-size:.82rem;line-height:1.9;color:rgba(255,255,255,.55);margin-bottom:14px;}
+.perks{list-style:none;margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);}
+.perks li{padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.78rem;color:rgba(255,255,255,.55);display:flex;align-items:center;gap:10px;}
+.perks li::before{content:'→';color:rgba(255,255,255,.25);font-size:.7rem;}
+.comm-features{display:grid;grid-template-columns:repeat(3,1fr);background:var(--white);border-bottom:1px solid var(--border2);}
+.cf{padding:44px 40px;border-right:1px solid var(--border2);}
+.cf:last-child{border-right:none;}
+.cf-icon{font-size:1.6rem;margin-bottom:14px;filter:grayscale(1);}
+.cf-title{font-family:'Sora',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:-.01em;margin-bottom:8px;color:var(--ink);}
+.cf-desc{font-size:.78rem;line-height:1.75;color:var(--mid);}
+
+/* ════ ABOUT ════ */
+.about-photo-hero{position:relative;min-height:400px;border-bottom:1px solid var(--border2);display:flex;align-items:flex-end;}
+.about-hero-text{position:relative;z-index:2;padding:56px;}
+.about-body-section{padding:72px 56px;background:var(--white);border-bottom:1px solid var(--border2);}
+.about-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:72px;margin-top:44px;}
+.about-quote{font-family:'Sora',sans-serif;font-size:clamp(1.5rem,2.5vw,2.4rem);line-height:1.3;font-weight:300;color:var(--ink2);}
+.about-quote strong{color:var(--ink);font-weight:700;}
+.about-text p{font-size:.85rem;line-height:1.95;color:var(--mid);margin-bottom:16px;}
+.values-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border2);margin-top:48px;border-radius:16px;overflow:hidden;}
+.val-card{background:var(--bg);padding:36px 32px;}
+.val-title{font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;letter-spacing:-.02em;margin-bottom:8px;color:var(--ink);}
+.val-desc{font-size:.78rem;line-height:1.75;color:var(--mid);}
+.team-section{padding:72px 56px;background:var(--white);}
+.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:36px;}
+.team-card{background:var(--bg);padding:28px;text-align:center;border-radius:14px;}
+.team-av{width:60px;height:60px;background:var(--bg2);border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;}
+.team-name{font-family:'Sora',sans-serif;font-weight:700;font-size:.8rem;letter-spacing:-.01em;margin-bottom:3px;color:var(--ink);}
+.team-role{font-size:.68rem;color:var(--light);}
+
+/* ════ PARTNERS ════ */
+.partner-hero{padding:72px 56px;background:var(--white);border-bottom:1px solid var(--border2);}
+.ph-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:flex-end;}
+.ph-title{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(2.4rem,5vw,5rem);letter-spacing:-.05em;line-height:.9;color:var(--ink);margin-bottom:16px;}
+.ph-sub{font-size:.9rem;line-height:1.8;color:var(--mid);margin-bottom:24px;max-width:360px;}
+.ph-right p{font-size:.83rem;line-height:1.88;color:var(--mid);margin-bottom:16px;}
+.pt-header-row{padding:56px 56px 32px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:flex-end;background:var(--bg);}
+.pt-grid{display:grid;grid-template-columns:repeat(3,1fr);background:var(--white);}
+.pt-card{padding:40px 36px;border-right:1px solid var(--border2);border-bottom:1px solid var(--border2);cursor:pointer;transition:background .25s;}
+.pt-card:hover{background:var(--bg);}
+.pt-icon{font-size:2rem;margin-bottom:18px;filter:grayscale(1);transition:filter .25s;}
+.pt-card:hover .pt-icon{filter:grayscale(0);}
+.pt-name{font-family:'Sora',sans-serif;font-weight:700;font-size:.95rem;letter-spacing:-.01em;margin-bottom:8px;color:var(--ink);}
+.pt-desc{font-size:.76rem;line-height:1.72;color:var(--mid);}
+.pt-arr{margin-top:12px;font-size:.72rem;font-weight:600;color:var(--light);display:inline-flex;align-items:center;gap:4px;transition:color .2s;}
+.pt-card:hover .pt-arr{color:var(--ink);}
+.why-row{padding:60px 56px;display:grid;grid-template-columns:1fr 1fr;gap:64px;background:var(--white);}
+.why-list{list-style:none;margin-top:16px;}
+.why-li{padding:16px 0;border-bottom:1px solid var(--border2);display:grid;grid-template-columns:30px 1fr;gap:14px;}
+.why-num{font-family:'Sora',sans-serif;font-weight:800;font-size:.72rem;color:var(--light);}
+.why-text{font-size:.8rem;line-height:1.72;color:var(--mid);}
+.why-text strong{display:block;font-weight:700;color:var(--ink);font-size:.82rem;margin-bottom:2px;}
+.steps-list{margin-top:16px;}
+.step-li{padding:16px 0;border-bottom:1px solid var(--border2);display:grid;grid-template-columns:28px 1fr;gap:14px;}
+.step-num{font-family:'Sora',sans-serif;font-weight:800;font-size:1.1rem;color:var(--border);}
+.step-text{font-size:.8rem;line-height:1.72;color:var(--mid);}
+.step-text strong{display:block;font-weight:700;color:var(--ink);font-size:.82rem;margin-bottom:2px;}
+
+/* ════ FORM ════ */
+.ob-wrap{max-width:680px;margin:0 auto;padding:60px 48px 96px;}
+.ob-heading{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(1.8rem,3.5vw,2.8rem);letter-spacing:-.05em;line-height:.9;color:var(--ink);margin-bottom:12px;}
+.ob-sub{font-size:.82rem;line-height:1.78;color:var(--mid);}
+.ob-progress{display:flex;gap:0;margin:40px 0;}
+.ob-dot-wrap{flex:1;text-align:center;position:relative;padding-bottom:18px;}
+.ob-dot-wrap::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--border2);border-radius:1px;}
+.ob-dot-wrap.done::after,.ob-dot-wrap.cur::after{background:var(--ink);}
+.ob-dot{width:24px;height:24px;border:2px solid var(--border);border-radius:50%;background:var(--white);display:inline-flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:700;color:var(--light);margin-bottom:7px;position:relative;z-index:1;}
+.ob-dot-wrap.done .ob-dot{background:var(--ink);border-color:var(--ink);color:var(--white);}
+.ob-dot-wrap.cur .ob-dot{border-color:var(--ink);color:var(--ink);}
+.ob-dot-lbl{font-size:.6rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--light);display:block;}
+.ob-dot-wrap.cur .ob-dot-lbl{color:var(--ink);}
+.ob-step{display:none;}.ob-step.active{display:block;}
+.ob-step-h{font-family:'Sora',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:-.02em;margin-bottom:5px;color:var(--ink);}
+.ob-step-sub{font-size:.78rem;color:var(--mid);margin-bottom:28px;line-height:1.65;}
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;}
+.type-opt{padding:20px 18px;border:2px solid var(--border2);border-radius:12px;cursor:pointer;transition:border-color .2s,background .2s;display:flex;gap:14px;align-items:flex-start;background:var(--white);}
+.type-opt:hover{border-color:var(--border);}
+.type-opt.selected{border-color:var(--ink);background:var(--bg);}
+.to-icon{font-size:1.4rem;flex-shrink:0;filter:grayscale(1);}
+.type-opt.selected .to-icon{filter:grayscale(0);}
+.to-name{font-family:'Sora',sans-serif;font-weight:700;font-size:.78rem;margin-bottom:3px;color:var(--ink);}
+.to-desc{font-size:.68rem;line-height:1.6;color:var(--mid);}
+.f-row{margin-bottom:16px;}
+.f-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.f-lbl{font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mid);display:block;margin-bottom:6px;}
+.f-inp{width:100%;background:var(--white);border:1.5px solid var(--border2);border-radius:8px;color:var(--ink);padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:.84rem;outline:none;transition:border-color .2s;}
+.f-inp:focus{border-color:var(--ink);}
+.f-inp::placeholder{color:var(--light);}
+.f-sel{width:100%;background:var(--white);border:1.5px solid var(--border2);border-radius:8px;color:var(--ink2);padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:.84rem;outline:none;appearance:none;}
+.f-ta{width:100%;background:var(--white);border:1.5px solid var(--border2);border-radius:8px;color:var(--ink);padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:.84rem;outline:none;resize:vertical;min-height:100px;transition:border-color .2s;}
+.f-ta:focus{border-color:var(--ink);}
+.f-ta::placeholder{color:var(--light);}
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:18px;}
+.ck-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid var(--border2);border-radius:8px;cursor:pointer;transition:all .2s;background:var(--white);}
+.ck-item:hover{border-color:var(--border);}
+.ck-item.checked{border-color:var(--ink);background:var(--bg);}
+.ck-box{width:14px;height:14px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.6rem;transition:all .2s;}
+.ck-item.checked .ck-box{background:var(--ink);border-color:var(--ink);color:var(--white);}
+.ck-lbl{font-size:.72rem;color:var(--ink2);}
+.ob-nav{display:flex;justify-content:space-between;margin-top:32px;padding-top:22px;border-top:1px solid var(--border2);}
+.rev-block{background:var(--bg);border-radius:10px;padding:22px;margin-bottom:10px;}
+.rev-t{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:12px;}
+.rev-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border2);}
+.rev-row:last-child{border-bottom:none;}
+.rev-k{font-size:.72rem;color:var(--mid);}
+.rev-v{font-size:.72rem;color:var(--ink);text-align:right;max-width:55%;}
+.success-wrap{text-align:center;padding:72px 0;}
+.success-icon{font-size:3rem;margin-bottom:20px;}
+.success-title{font-family:'Sora',sans-serif;font-weight:800;font-size:2rem;letter-spacing:-.04em;color:var(--ink);margin-bottom:12px;}
+.success-sub{font-size:.82rem;line-height:1.82;color:var(--mid);max-width:400px;margin:0 auto 28px;}
+.app-id{display:inline-block;background:var(--bg);border:1.5px solid var(--border2);border-radius:8px;padding:10px 22px;font-size:.72rem;color:var(--mid);margin-bottom:24px;}
+
+/* ════ DASHBOARD ════ */
+.dash-login-wrap{max-width:360px;margin:80px auto;padding:0 24px;}
+.dash-header{padding:28px 48px;background:var(--white);border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;}
+.dash-title{font-family:'Sora',sans-serif;font-weight:800;font-size:1.3rem;letter-spacing:-.03em;color:var(--ink);}
+.dash-stats{display:grid;grid-template-columns:repeat(4,1fr);background:var(--white);border-bottom:1px solid var(--border2);}
+.ds-cell{padding:24px 32px;border-right:1px solid var(--border2);}
+.ds-cell:last-child{border-right:none;}
+.ds-n{font-family:'Sora',sans-serif;font-weight:800;font-size:2rem;letter-spacing:-.04em;color:var(--ink);display:block;margin-bottom:3px;}
+.ds-l{font-size:.65rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--light);}
+.dash-table-wrap{padding:36px 48px;background:var(--white);}
+.dash-filter-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+.dash-filter-title{font-family:'Sora',sans-serif;font-weight:700;font-size:.9rem;color:var(--ink);}
+.dash-filters{display:flex;gap:6px;}
+.df-btn{font-size:.68rem;font-weight:600;padding:6px 14px;border:1.5px solid var(--border2);border-radius:100px;background:none;color:var(--mid);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.df-btn:hover,.df-btn.active{border-color:var(--ink);color:var(--ink);background:var(--bg);}
+.dash-table{width:100%;border-collapse:collapse;}
+.dash-table th{font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--light);padding:11px 14px;text-align:left;border-bottom:1.5px solid var(--border2);}
+.dash-table td{padding:14px;border-bottom:1px solid var(--border2);font-size:.78rem;color:var(--ink2);vertical-align:middle;}
+.dash-table tr:hover td{background:var(--bg);}
+.s-pill{display:inline-block;font-size:.58rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:100px;}
+.s-pill.pending{background:#fff8e1;color:#b45309;}
+.s-pill.approved{background:#f0fdf4;color:#166534;}
+.s-pill.review{background:#fff7ed;color:#9a3412;}
+.da-btn{font-size:.64rem;font-weight:600;padding:5px 12px;border:1.5px solid var(--border2);border-radius:6px;background:none;color:var(--mid);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;margin-right:5px;}
+.da-btn:hover{border-color:var(--ink);color:var(--ink);background:var(--bg);}
+.empty{padding:52px;text-align:center;}
+.empty-t{font-family:'Sora',sans-serif;font-weight:700;font-size:.9rem;color:var(--ink);margin-bottom:6px;}
+.empty-s{font-size:.75rem;color:var(--mid);}
+.modal-overlay{position:fixed;inset:0;background:rgba(26,25,23,.45);z-index:600;display:flex;align-items:flex-start;justify-content:flex-end;}
+.modal-overlay.hidden{display:none;}
+.modal-panel{background:var(--white);width:440px;min-height:100vh;overflow-y:auto;padding:36px 32px;animation:slideIn .25s ease;box-shadow:-8px 0 40px rgba(26,25,23,.12);}
+@keyframes slideIn{from{transform:translateX(100%);}to{transform:translateX(0);}}
+.modal-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border:1.5px solid var(--border2);border-radius:6px;background:none;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;color:var(--mid);}
+.modal-close:hover{background:var(--bg);}
+.modal-bname{font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;color:var(--ink);padding-right:36px;margin-bottom:3px;}
+.modal-type{font-size:.68rem;color:var(--mid);}
+.modal-sec{margin-bottom:18px;}
+.modal-sec-t{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--light);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border2);}
+.mf-k{font-size:.64rem;color:var(--light);margin-bottom:1px;}
+.mf-v{font-size:.78rem;color:var(--ink2);line-height:1.6;margin-bottom:8px;}
+.modal-actions{display:flex;gap:8px;margin-top:24px;}
+
+/* FOOTER */
+footer{padding:32px 56px;background:var(--white);border-top:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.f-logo{font-family:'Sora',sans-serif;font-weight:800;font-size:.95rem;letter-spacing:-.03em;color:var(--ink);cursor:pointer;}
+.f-links{display:flex;gap:24px;list-style:none;}
+.f-links span{font-size:.72rem;font-weight:500;color:var(--mid);cursor:pointer;transition:color .2s;}
+.f-links span:hover{color:var(--ink);}
+.f-copy{font-size:.68rem;color:var(--light);}
+
+@media(max-width:860px){
+  nav{padding:0 18px;}.nav-links{display:none;}
+  #home-hero{padding:80px 24px 56px;}
+  .home-split{grid-template-columns:1fr;}
+  .spaces-grid,.pt-grid,.comm-features{grid-template-columns:1fr;}
+  .space-card,.pt-card,.cf{border-right:none;border-bottom:1px solid var(--border2);}
+  .sp-hero,.sd-content,.comm-content,.about-grid,.join-section,.why-row,.ph-grid{grid-template-columns:1fr;}
+  .sp-photo{min-height:340px;}
+  .sd-hero{min-height:auto;}
+  .sub-strip,.oth-grid{grid-template-columns:1fr 1fr;}
+  .stats-row,.dash-stats{grid-template-columns:1fr 1fr;}
+  .type-grid,.check-grid,.f-row-2{grid-template-columns:1fr;}
+  .team-grid{grid-template-columns:1fr 1fr;}
+  .values-grid{grid-template-columns:1fr;}
+  .mosaic{grid-template-columns:1fr;}.mosaic-cell:nth-child(1){grid-row:auto;}
+  .join-section{grid-template-columns:1fr;}
+  .join-left{border-bottom:1px solid var(--border2);}
+  .page-hero,.exp-banner-content,.comm-content,.about-hero-text,.sd-content,.about-body-section,.partner-hero,.why-row,.pt-header-row,.ob-wrap,.dash-table-wrap,.dash-header,.quote-strip,.partner-band{padding-left:24px;padding-right:24px;}
+  footer{flex-direction:column;text-align:center;padding:24px 18px;}
+  .modal-panel{width:100%;min-height:auto;max-height:90vh;}
+  .hero-coord{display:none;}
+  .partner-band{flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+<div class="cur" id="cur"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="go('home')">pepvoga</div>
+  <ul class="nav-links">
+    <li><span onclick="go('spaces')">Spaces</span></li>
+    <li><span onclick="go('experiences')">Experiences</span></li>
+    <li><span onclick="go('community')">Community</span></li>
+    <li><span onclick="go('about')">About</span></li>
+  </ul>
+  <div class="nav-right">
+    <span class="nav-partner" onclick="go('partners')">For Partners</span>
+    <span class="nav-admin" onclick="go('dashboard')">Admin ↗</span>
+    <span class="nav-cta" onclick="go('join')">Join</span>
+  </div>
+</nav>
+
+<!-- ═══════ HOME ═══════ -->
+<div class="page active" id="pg-home">
+  <section id="home-hero">
+    <div class="photo-wrap zoom" id="heroPhoto">
+      <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2000&q=85" alt="Mountain landscape" loading="eager"/>
+    </div>
+    <div class="ov-soft"></div>
+    <div class="hero-tag-pill">✈ A community for the untamed</div>
+    <div class="hero-hl rv">
+      PEPVOGA
+    </div>
+    <div class="hero-foot">
+      <p class="hero-sub rv">For people who measure weekends in altitude gained, waves caught, and places nobody else has been.</p>
+      <div class="rv d2" style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
+        <button class="btn-white" onclick="go('spaces')">Explore Spaces →</button>
+        <button onclick="go('experiences')" style="background:rgba(255,255,255,.12);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;padding:12px 22px;border-radius:8px;cursor:pointer;">View Experiences</button>
+      </div>
+    </div>
+    <div class="hero-coord"><span>28°36'N  77°12'E</span><span>ALT  216 M</span></div>
+    <div class="hero-scroll"><span>Scroll</span><div class="scroll-line"></div></div>
+  </section>
+
+  <!-- Destination pins -->
+  <div class="pins-row" id="pinsRow"></div>
+
+  <!-- Ticker -->
+  <div class="ticker"><div class="ticker-track" id="hticker"></div></div>
+
+  <!-- Split -->
+  <div class="home-split">
+    <div class="split-card rv" onclick="go('spaces')">
+      <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80" alt="Hiking"/></div>
+      <div class="ov-bottom"></div>
+      <div class="split-card-inner">
+        <div class="split-num">01</div>
+        <div class="split-title">Spaces</div>
+        <p class="split-desc">Wilderness & mountains, ocean & open water, crazy urban edges. Three arenas, infinite terrain.</p>
+        <span class="split-cta">Explore Spaces →</span>
+      </div>
+    </div>
+    <div class="split-card rv d1" onclick="go('experiences')">
+      <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=1200&q=80" alt="Surfing"/></div>
+      <div class="ov-bottom"></div>
+      <div class="split-card-inner">
+        <div class="split-num">02</div>
+        <div class="split-title">Experiences</div>
+        <p class="split-desc">Scuba, surfing, climbing, paragliding, cycling and 75+ more. Each sport has its own tribe.</p>
+        <span class="split-cta">View Experiences →</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-box rv"><span class="stat-num">12K+</span><div class="stat-lbl">Members Worldwide</div></div>
+    <div class="stat-box rv d1"><span class="stat-num">80+</span><div class="stat-lbl">Sports &amp; Disciplines</div></div>
+    <div class="stat-box rv d2"><span class="stat-num">340+</span><div class="stat-lbl">Destinations</div></div>
+    <div class="stat-box rv d3"><span class="stat-num">28</span><div class="stat-lbl">Countries Active</div></div>
+  </div>
+
+  <!-- Quote + copy -->
+  <div class="quote-strip rv">
+    <div>
+      <div class="label-tag">Our Manifesto</div>
+      <p class="quote-text">"The best stories are never told from a desk. <em>Go find yours.</em>"</p>
+    </div>
+    <div>
+      <p class="quote-right" style="font-size:.88rem;line-height:1.85;color:var(--mid);margin-bottom:14px;">pepvoga was built for the people who open Google Maps and zoom into blank terrain — just to wonder what's there.</p>
+      <p class="quote-right" style="font-size:.88rem;line-height:1.85;color:var(--mid);margin-bottom:24px;">From rooftop slacklining in Tokyo to whitewater kayaking in Patagonia — if it raises your pulse and feeds your soul, it belongs here.</p>
+      <button class="btn-dark" onclick="go('about')">Our Story →</button>
+    </div>
+  </div>
+
+  <!-- Photo mosaic -->
+  <div class="mosaic rv">
+    <div class="mosaic-cell"><img src="https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=1000&q=80" alt="Climbing"/><div class="ov-bottom"></div><div class="mosaic-lbl">Rock Climbing</div></div>
+    <div class="mosaic-cell"><img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=800&q=80" alt="Scuba"/><div class="ov-bottom"></div><div class="mosaic-lbl">Scuba Diving</div></div>
+    <div class="mosaic-cell"><img src="https://images.unsplash.com/photo-1503220317375-aaad61436b1b?auto=format&fit=crop&w=800&q=80" alt="Paragliding"/><div class="ov-bottom"></div><div class="mosaic-lbl">Paragliding</div></div>
+    <div class="mosaic-cell"><img src="https://images.unsplash.com/photo-1455264745730-cb3b76250ae8?auto=format&fit=crop&w=800&q=80" alt="Surfing"/><div class="ov-bottom"></div><div class="mosaic-lbl">Surfing</div></div>
+    <div class="mosaic-cell"><img src="https://images.unsplash.com/photo-1483721310020-03333e577078?auto=format&fit=crop&w=800&q=80" alt="Cycling"/><div class="ov-bottom"></div><div class="mosaic-lbl">Expedition Cycling</div></div>
+  </div>
+
+  <!-- Partner band -->
+  <div class="partner-band rv">
+    <div class="pb-left">
+      <div class="pb-title">Are you a service provider?</div>
+      <p>Dive operators, surf schools, climbing gyms, adventure camps — get listed, get discovered, and grow with the pepvoga community.</p>
+      <div class="pb-tags"><span class="pb-tag">Dive Operators</span><span class="pb-tag">Surf Schools</span><span class="pb-tag">Climbing Gyms</span><span class="pb-tag">Adventure Camps</span><span class="pb-tag">Gear Rental</span></div>
+    </div>
+    <button class="btn-white" onclick="go('partners')">Partner With Us →</button>
+  </div>
+
+  <!-- Join -->
+  <div class="join-section">
+    <div class="join-left rv">
+      <div class="label-tag">Join the Community</div>
+      <div class="join-title">STEP<br>OUTSIDE.</div>
+      <p class="join-sub">12,000 people already chose this. Your next adventure partner is already in here, waiting.</p>
+    </div>
+    <div class="join-right rv">
+      <div class="jf-label">Get Early Access</div>
+      <div class="jf-wrap"><input type="email" class="j-inp" id="j-e1" placeholder="your@email.com"/><button class="j-sub" onclick="doJoin('j-e1')">Join →</button></div>
+      <p class="j-note">No spam. No sponsored posts. Just the wild stuff.</p>
+      <ul class="j-perks"><li>Adventure partner discovery across 80+ countries</li><li>Members-only secret spots map worldwide</li><li>Gear library — borrow before you buy</li><li>Monthly challenges with real stakes</li></ul>
+    </div>
+  </div>
+
+  <footer><div class="f-logo" onclick="go('home')">pepvoga</div><ul class="f-links"><li><span onclick="go('spaces')">Spaces</span></li><li><span onclick="go('experiences')">Experiences</span></li><li><span onclick="go('community')">Community</span></li><li><span onclick="go('about')">About</span></li><li><span onclick="go('partners')">Partners</span></li></ul><div class="f-copy">© 2026 pepvoga</div></footer>
+</div>
+
+<!-- ═══════ SPACES ═══════ -->
+<div class="page" id="pg-spaces">
+  <div class="page-hero rv">
+    <div><div class="label-tag">01 — Spaces</div><h1 class="display" style="font-size:clamp(2.8rem,6vw,6rem);color:var(--ink);">WHERE<br>YOU GO</h1></div>
+    <p class="page-hero-sub">The arenas. The backdrops. The places that become part of you long after you leave.</p>
+  </div>
+  <div class="spaces-grid" style="border-bottom:1px solid var(--border2);">
+    <div class="space-card rv" onclick="go('space-wilderness')">
+      <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1000&q=80" alt="Wilderness"/></div>
+      <div class="ov-bottom"></div>
+      <div class="space-card-body"><div class="sc-label">Space 01 · 27°59'N 86°55'E</div><div class="sc-title">Wilderness &amp;<br>Mountains</div><p class="sc-desc">Ridgelines, basecamp mornings, summits with no signal.</p><span class="sc-tag">Trails · Peaks · Forests</span><div class="sc-enter">Enter Space →</div></div>
+    </div>
+    <div class="space-card rv d1" onclick="go('space-ocean')">
+      <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?auto=format&fit=crop&w=1000&q=80" alt="Ocean"/></div>
+      <div class="ov-bottom"></div>
+      <div class="space-card-body"><div class="sc-label">Space 02 · 0°21'S 130°10'E</div><div class="sc-title">Ocean &amp;<br>Open Water</div><p class="sc-desc">The sea, the reef, the river. Spaces you show up in anyway.</p><span class="sc-tag">Sea · Rivers · Lakes</span><div class="sc-enter">Enter Space →</div></div>
+    </div>
+    <div class="space-card rv d2" onclick="go('space-urban')">
+      <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=1000&q=80" alt="Urban"/></div>
+      <div class="ov-bottom"></div>
+      <div class="space-card-body"><div class="sc-label">Space 03 · 35°41'N 139°41'E</div><div class="sc-title">Crazy &amp;<br>Urban Edges</div><p class="sc-desc">Rooftops at 3am. Abandoned lots. The spaces cities tried to hide.</p><span class="sc-tag">Urban · Underground · Vertical</span><div class="sc-enter">Enter Space →</div></div>
+    </div>
+  </div>
+  <footer><div class="f-logo" onclick="go('home')">pepvoga</div><ul class="f-links"><li><span onclick="go('experiences')">Experiences →</span></li></ul><div class="f-copy">© 2026 pepvoga</div></footer>
+</div>
+
+<!-- Space: Wilderness -->
+<div class="page" id="pg-space-wilderness">
+  <div class="sd-hero rv">
+    <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=2000&q=80" alt="Alps"/></div>
+    <div class="ov-left"></div>
+    <div class="sd-content">
+      <div><div class="label-tag" style="color:rgba(255,255,255,.4);">Space 01</div><div class="sd-title">WILDER-<br>NESS</div><p class="sd-sub">Where the map runs out and the adventure begins.</p></div>
+      <div><p class="sd-rp">From forest trails in the Western Ghats to Himalayan routes — every mountain asks something different of you. Ridgelines, basecamp dawns, and summits that cost everything to reach.</p><div class="sd-attrs"><div class="sd-attr"><div class="sd-attr-k">Terrain</div><div class="sd-attr-v">Alpine, Forest, Desert, Tundra</div></div><div class="sd-attr"><div class="sd-attr-k">Skill Range</div><div class="sd-attr-v">Beginner → Expedition</div></div><div class="sd-attr"><div class="sd-attr-k">Season</div><div class="sd-attr-v">Year-round (varies)</div></div><div class="sd-attr"><div class="sd-attr-k">Top Regions</div><div class="sd-attr-v">Himalayas, Alps, Andes</div></div></div></div>
+    </div>
+  </div>
+  <div style="background:var(--white);border-bottom:1px solid var(--border2);"><div style="padding:32px 48px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border2);"><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:.85rem;color:var(--ink);">Sports in this Space</span><button class="btn-outline" onclick="go('experiences')">View All →</button></div>
+  <div class="sport-grid"><div class="sport-item" onclick="go('experiences');switchTab('climbing')"><div class="si-icon">🧗</div><div class="si-name">Rock Climbing</div><div class="si-desc">Vertical terrain, all styles</div></div><div class="sport-item" onclick="go('experiences');switchTab('cycling')"><div class="si-icon">🚵</div><div class="si-name">Expedition Cycling</div><div class="si-desc">Mountain passes & gravel</div></div><div class="sport-item"><div class="si-icon">🏃</div><div class="si-name">Trail Running</div><div class="si-desc">Single-track to ultras</div></div><div class="sport-item"><div class="si-icon">⛺</div><div class="si-name">Mountaineering</div><div class="si-desc">High altitude objectives</div></div></div></div>
+  <footer><div class="f-logo" onclick="go('home')">pepvoga</div><ul class="f-links"><li><span onclick="go('spaces')">← All Spaces</span></li></ul><div class="f-copy">© 2026 pepvoga</div></footer>
+</div>
+
+<!-- Space: Ocean -->
+<div class="page" id="pg-space-ocean">
+  <div class="sd-hero rv">
+    <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1682687982501-1e58ab814714?auto=format&fit=crop&w=2000&q=80" alt="Ocean"/></div>
+    <div class="ov-left"></div>
+    <div class="sd-content">
+      <div><div class="label-tag" style="color:rgba(255,255,255,.4);">Space 02</div><div class="sd-title">OCEAN &amp;<br>OPEN<br>WATER</div><p class="sd-sub">60% of Earth is ocean. Most people only see the surface.</p></div>
+      <div><p class="sd-rp">Whether threading a reef at 25m or reading a swell at dawn — water is the great equaliser. It doesn't care about your credentials. It demands respect and rewards commitment.</p><div class="sd-attrs"><div class="sd-attr"><div class="sd-attr-k">Water Type</div><div class="sd-attr-v">Ocean, Sea, River, Lake</div></div><div class="sd-attr"><div class="sd-attr-k">Skill Range</div><div class="sd-attr-v">First-timer → Expert</div></div><div class="sd-attr"><div class="sd-attr-k">Depth Range</div><div class="sd-attr-v">Surface → 60m+ Technical</div></div><div class="sd-attr"><div class="sd-attr-k">Top Regions</div><div class="sd-attr-v">Indo-Pacific, Caribbean, Med</div></div></div></div>
+    </div>
+  </div>
+  <div style="background:var(--white);border-bottom:1px solid var(--border2);"><div style="padding:32px 48px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border2);"><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:.85rem;color:var(--ink);">Sports in this Space</span><button class="btn-outline" onclick="go('experiences')">View All →</button></div>
+  <div class="sport-grid"><div class="sport-item" onclick="go('experiences');switchTab('scuba')"><div class="si-icon">🤿</div><div class="si-name">Scuba Diving</div><div class="si-desc">Reefs, wrecks, caves</div></div><div class="sport-item" onclick="go('experiences');switchTab('surfing')"><div class="si-icon">🏄</div><div class="si-name">Surfing</div><div class="si-desc">Beach breaks to big waves</div></div><div class="sport-item"><div class="si-icon">🚣</div><div class="si-name">Kayaking</div><div class="si-desc">Sea & whitewater</div></div><div class="sport-item"><div class="si-icon">🏊</div><div class="si-name">Open Water Swim</div><div class="si-desc">1km to channel crossings</div></div></div></div>
+  <footer><div class="f-logo" onclick="go('home')">pepvoga</div><ul class="f-links"><li><span onclick="go('spaces')">← All Spaces</span></li></ul><div class="f-copy">© 2026 pepvoga</div></footer>
+</div>
+
+<!-- Space: Urban -->
+<div class="page" id="pg-space-urban">
+  <div class="sd-hero rv">
+    <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=2000&q=80" alt="Urban"/></div>
+    <div class="ov-left"></div>
+    <div class="sd-content">
+      <div><div class="label-tag" style="color:rgba(255,255,255,.4);">Space 03</div><div class="sd-title">CRAZY &amp;<br>URBAN<br>EDGES</div><p class="sd-sub">Cities are full of spaces that weren't designed to be explored.</p></div>
+      <div><p class="sd-rp">Rooftops, tunnels, abandoned buildings, vertical walls. Seeing the built environment as terrain — finding the extraordinary hiding inside the ordinary.</p><div class="sd-attrs"><div class="sd-attr"><div class="sd-attr-k">Environment</div><div class="sd-attr-v">Urban, Industrial, Sub-surface</div></div><div class="sd-attr"><div class="sd-attr-k">Skill Range</div><div class="sd-attr-v">Explorer → Technical</div></div><div class="sd-attr"><div class="sd-attr-k">Access</div><div class="sd-attr-v">Public to Permitted Spaces</div></div><div class="sd-attr"><div class="sd-attr-k">Top Cities</div><div class="sd-attr-v">Tokyo, Berlin, Mumbai, NYC</div></div></div></div>
+    </div>
+  </div>
+  <div style="background:var(--white);border-bottom:1px solid var(--border2);"><div style="padding:32px 48px 20px;border-bottom:1px solid var(--border2);"><span style="font-family:'Sora',sans-serif;font-weight:700;font-size:.85rem;color:var(--ink);">Activities in this Space</span></div>
+  <div class="sport-grid"><div class="sport-item"><div class="si-icon">🤸</div><div class="si-name">Slacklining</div><div class="si-desc">Urban highlines & parklines</div></div><div class="sport-item"><div class="si-icon">🔦</div><div class="si-name">Urban Exploration</div><div class="si-desc">Abandoned spaces & rooftops</div></div><div class="sport-item"><div class="si-icon">🕳️</div><div class="si-name">Caving</div><div class="si-desc">Natural & urban cave systems</div></div><div class="sport-item"><div class="si-icon">🏃</div><div class="si-name">Parkour</div><div class="si-desc">Movement through city terrain</div></div></div></div>
+  <footer><div class="f-logo" onclick="go('home')">pepvoga</div><ul class="f-links"><li><span onclick="go('spaces')">← All Spaces</span></li></ul><div class="f-copy">© 2026 pepvoga</div></footer>
+</div>
+
+<!-- ═══════ EXPERIENCES ═══════ -->
+<div class="page" id="pg-experiences">
+  <div class="exp-banner rv">
+    <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2000&q=90" alt="Adventure" style="object-position:center 40%;"/></div>
+    <div class="ov-soft"></div>
+    <div class="exp-banner-content">
+      <div><div class="label-tag" style="color:rgba(255,255,255,.45);">02 — Experiences</div><h1 class="display" style="font-size:clamp(2.8rem,6vw,6rem);color:var(--white);">WHAT<br>YOU DO</h1></div>
+      <p style="font-family:'DM Sans',sans-serif;font-style:italic;font-size:.95rem;color:rgba(255,255,255,.6);line-height:1.72;max-width:250px;">Choose your obsession. Or collect them all.</p>
+    </div>
+  </div>
+  <div class="sport-tabs" id="expTabs">
+    <div class="tab active" data-p="scuba">Scuba Diving</div>
+    <div class="tab" data-p="surfing">Surfing</div>
+    <div class="tab" data-p="climbing">Rock Climbing</div>
+    <div class="tab" data-p="paragliding">Paragliding</div>
+    <div class="tab" data-p="cycling">Expedition Cycling</div>
+    <div class="tab" data-p="others">+ Others</div>
+  </div>
+
+  <!-- SCUBA -->
+  <div class="sp active" id="ep-scuba">
+    <div class="sp-hero">
+      <div class="sp-photo">
+        <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1682687982501-1e58ab814714?auto=format&fit=crop&w=1400&q=90" alt="Scuba" style="object-position:center center;"/></div>
+        <div class="ov-bottom"></div>
+        <div class="sp-passport"><div class="sp-pass-t">Entry Permit</div><div class="sp-pass-loc">0°21'S 130°10'E</div></div>
+        <div class="sp-photo-content"><span class="sp-icon">🤿</span><h2 class="sp-title">SCUBA<br>DIVING</h2><p class="sp-tagline">60% of Earth is ocean. Most people only see the surface. Not us.</p><button class="btn-white" onclick="go('join')">Find Dive Buddies →</button></div>
+      </div>
+      <div class="sp-info">
+        <div class="sp-det"><div class="det-k">About</div><p class="det-v">Scuba opens a world of weightlessness, silence, and extraordinary life. Whether newly certified or chasing technical wrecks at depth — we connect you to the right dive.</p><div class="pills"><span class="pill">Open Water</span><span class="pill">Advanced OW</span><span class="pill">Tech Diving</span><span class="pill">Cave Diving</span><span class="pill">Freediving</span></div></div>
+        <div class="sp-det"><div class="det-k">Top Destinations</div><p class="det-v">Raja Ampat, Blue Hole Dahab, Similan Islands, Great Blue Hole Belize, Red Sea, Komodo, Cocos Island.</p><div class="pills"><span class="pill">Indonesia</span><span class="pill">Maldives</span><span class="pill">Egypt</span><span class="pill">Belize</span></div></div>
+      </div>
+    </div>
+    <div class="sub-strip"><div class="sub-c"><div class="sub-ic">🐟</div><div class="sub-n">Reef Dives</div><div class="sub-d">Guided dives on living reefs worldwide.</div></div><div class="sub-c"><div class="sub-ic">🚢</div><div class="sub-n">Wreck Diving</div><div class="sub-d">WWII ships and sunken aircraft.</div></div><div class="sub-c"><div class="sub-ic">🦈</div><div class="sub-n">Pelagic Encounters</div><div class="sub-d">Sharks, mantas, and whale sharks.</div></div><div class="sub-c"><div class="sub-ic">🕳️</div><div class="sub-n">Cave & Cavern</div><div class="sub-d">Technical cave systems at depth.</div></div></div>
+  </div>
+
+  <!-- SURFING -->
+  <div class="sp" id="ep-surfing">
+    <div class="sp-hero">
+      <div class="sp-photo">
+        <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1505459668311-8dfac7952bf0?auto=format&fit=crop&w=1400&q=90" alt="Surfing" style="object-position:center 40%;"/></div>
+        <div class="ov-bottom"></div>
+        <div class="sp-passport"><div class="sp-pass-t">Entry Permit</div><div class="sp-pass-loc">8°43'S 115°10'E</div></div>
+        <div class="sp-photo-content"><span class="sp-icon">🏄</span><h2 class="sp-title">SURFING</h2><p class="sp-tagline">No two waves are the same. Neither are the people who chase them.</p><button class="btn-white" onclick="go('join')">Find Your Crew →</button></div>
+      </div>
+      <div class="sp-info">
+        <div class="sp-det"><div class="det-k">About</div><p class="det-v">From mellow beach breaks to terrifying big wave slabs — surfing is a lifelong conversation between you, the ocean, and the world's coastlines.</p><div class="pills"><span class="pill">Longboard</span><span class="pill">Shortboard</span><span class="pill">Big Wave</span><span class="pill">SUP</span></div></div>
+        <div class="sp-det"><div class="det-k">Top Destinations</div><p class="det-v">G-Land Java, Uluwatu Bali, Hossegor France, J-Bay South Africa, Pipeline Hawaii, Mentawai Islands.</p><div class="pills"><span class="pill">Bali</span><span class="pill">Hawaii</span><span class="pill">Portugal</span></div></div>
+      </div>
+    </div>
+    <div class="sub-strip"><div class="sub-c"><div class="sub-ic">🌅</div><div class="sub-n">Dawn Patrol</div><div class="sub-d">Early sessions with locals worldwide.</div></div><div class="sub-c"><div class="sub-ic">🏕️</div><div class="sub-n">Surf Camps</div><div class="sub-d">Multi-day camps at the world's best breaks.</div></div><div class="sub-c"><div class="sub-ic">🌀</div><div class="sub-n">Big Wave Clinics</div><div class="sub-d">Tow-in training for advanced surfers.</div></div><div class="sub-c"><div class="sub-ic">🗺️</div><div class="sub-n">Surf Trips</div><div class="sub-d">Member trips to remote, uncrowded breaks.</div></div></div>
+  </div>
+
+  <!-- CLIMBING -->
+  <div class="sp" id="ep-climbing">
+    <div class="sp-hero">
+      <div class="sp-photo">
+        <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1564769625905-50e93615e769?auto=format&fit=crop&w=1400&q=90" alt="Climbing" style="object-position:center 30%;"/></div>
+        <div class="ov-bottom"></div>
+        <div class="sp-passport"><div class="sp-pass-t">Entry Permit</div><div class="sp-pass-loc">37°38'N 119°32'W</div></div>
+        <div class="sp-photo-content"><span class="sp-icon">🧗</span><h2 class="sp-title">ROCK<br>CLIMBING</h2><p class="sp-tagline">Every crack, crimp, and face is a problem worth solving.</p><button class="btn-white" onclick="go('join')">Find Partners →</button></div>
+      </div>
+      <div class="sp-info">
+        <div class="sp-det"><div class="det-k">About</div><p class="det-v">Climbing is chess on vertical terrain. From the belayer you trust with your life to the partner who gives you beta that actually works.</p><div class="pills"><span class="pill">Bouldering</span><span class="pill">Sport</span><span class="pill">Trad</span><span class="pill">Alpine</span></div></div>
+        <div class="sp-det"><div class="det-k">Top Destinations</div><p class="det-v">Yosemite, Kalymnos Greece, Fontainebleau, Red Rock Canyon, Hampi India, Railay Thailand, Dolomites.</p><div class="pills"><span class="pill">Europe</span><span class="pill">USA</span><span class="pill">Asia</span></div></div>
+      </div>
+    </div>
+    <div class="sub-strip"><div class="sub-c"><div class="sub-ic">🪨</div><div class="sub-n">Bouldering</div><div class="sub-d">Problems, beta, grades outdoors.</div></div><div class="sub-c"><div class="sub-ic">⛰️</div><div class="sub-n">Multi-Pitch</div><div class="sub-d">Big wall adventures with partners.</div></div><div class="sub-c"><div class="sub-ic">🏔️</div><div class="sub-n">Alpine Routes</div><div class="sub-d">High altitude routes demanding everything.</div></div><div class="sub-c"><div class="sub-ic">🌊</div><div class="sub-n">Deep Water Solo</div><div class="sub-d">Sea cliffs. No rope. Pure adrenaline.</div></div></div>
+  </div>
+
+  <!-- PARAGLIDING -->
+  <div class="sp" id="ep-paragliding">
+    <div class="sp-hero">
+      <div class="sp-photo">
+        <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&q=90" alt="Paragliding" style="object-position:center 60%;"/></div>
+        <div class="ov-bottom"></div>
+        <div class="sp-passport"><div class="sp-pass-t">Entry Permit</div><div class="sp-pass-loc">32°01'N 76°44'E</div></div>
+        <div class="sp-photo-content"><span class="sp-icon">🪂</span><h2 class="sp-title">PARA-<br>GLIDING</h2><p class="sp-tagline">Launch off a mountain and the world makes a different kind of sense.</p><button class="btn-white" onclick="go('join')">Find Flying Partners →</button></div>
+      </div>
+      <div class="sp-info">
+        <div class="sp-det"><div class="det-k">About</div><p class="det-v">Paragliding connects you to weather, landscape, and physics in a way no other sport does. From tandem flights to cross-country XC — the sky has infinite terrain.</p><div class="pills"><span class="pill">Tandem</span><span class="pill">Solo P2</span><span class="pill">XC</span><span class="pill">Acro</span></div></div>
+        <div class="sp-det"><div class="det-k">Top Launch Sites</div><p class="det-v">Bir Billing India, Oludeniz Turkey, Interlaken, Col du Granon France, Pokhara Nepal, Annecy France.</p><div class="pills"><span class="pill">Himalayas</span><span class="pill">Alps</span><span class="pill">Nepal</span></div></div>
+      </div>
+    </div>
+    <div class="sub-strip"><div class="sub-c"><div class="sub-ic">☁️</div><div class="sub-n">Thermal Flights</div><div class="sub-d">Thermal hunting with fellow pilots.</div></div><div class="sub-c"><div class="sub-ic">🌄</div><div class="sub-n">Bivouac Trips</div><div class="sub-d">Fly and camp over multiple days.</div></div><div class="sub-c"><div class="sub-ic">🌀</div><div class="sub-n">Acro Training</div><div class="sub-d">Advanced manoeuvres with safety support.</div></div><div class="sub-c"><div class="sub-ic">🎓</div><div class="sub-n">P2 Courses</div><div class="sub-d">Community-recommended schools worldwide.</div></div></div>
+  </div>
+
+  <!-- CYCLING -->
+  <div class="sp" id="ep-cycling">
+    <div class="sp-hero">
+      <div class="sp-photo">
+        <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1400&q=90" alt="Cycling" style="object-position:center 50%;"/></div>
+        <div class="ov-bottom"></div>
+        <div class="sp-passport"><div class="sp-pass-t">Entry Permit</div><div class="sp-pass-loc">32°44'N 74°51'E</div></div>
+        <div class="sp-photo-content"><span class="sp-icon">🚵</span><h2 class="sp-title">EXPEDI-<br>TION<br>CYCLING</h2><p class="sp-tagline">When the distance between places becomes the entire point.</p><button class="btn-white" onclick="go('join')">Find Riding Partners →</button></div>
+      </div>
+      <div class="sp-info">
+        <div class="sp-det"><div class="det-k">About</div><p class="det-v">Bicycle touring collapses the map. You cover terrain slowly enough to truly understand it. Gravel routes, mountain passes, cross-continental odysseys.</p><div class="pills"><span class="pill">Bikepacking</span><span class="pill">Gravel</span><span class="pill">MTB</span><span class="pill">Road Touring</span></div></div>
+        <div class="sp-det"><div class="det-k">Epic Routes</div><p class="det-v">Manali to Leh, Trans-Siberian, Tour Divide, Cape to Cape Africa, Karakoram Highway, GDMBR USA.</p><div class="pills"><span class="pill">Asia</span><span class="pill">Americas</span><span class="pill">Africa</span></div></div>
+      </div>
+    </div>
+    <div class="sub-strip"><div class="sub-c"><div class="sub-ic">🏔️</div><div class="sub-n">Mountain Passes</div><div class="sub-d">High altitude Himalayan climbs.</div></div><div class="sub-c"><div class="sub-ic">🌍</div><div class="sub-n">Cross-Country</div><div class="sub-d">Continent-spanning expeditions.</div></div><div class="sub-c"><div class="sub-ic">🪨</div><div class="sub-n">Gravel Races</div><div class="sub-d">Community entry into iconic events.</div></div><div class="sub-c"><div class="sub-ic">🏕️</div><div class="sub-n">Bikepacking Nights</div><div class="sub-d">Overnights into the unknown.</div></div></div>
+  </div>
+
+  <!-- OTHERS -->
+  <div class="sp" id="ep-others"><div class="oth-bar"><div class="oth-t">More Sports</div><div class="oth-c">— 80+ disciplines and growing</div></div><div class="oth-grid" id="othGrid"></div></div>
+  <footer><div class="f-logo" onclick="go('home')">pepvoga</div><ul class="f-links"><li><span onclick="go('spaces')">Spaces</span></li><li><span onclick="go('partners')">Partners</span></li></ul><div class="f-copy">© 2026 pepvoga</div></footer>
+</div>
+
+<!-- ═══════ COMMUNITY ═══════ -->
+<div class="page" id="pg-community">
+  <div class="comm-banner rv">
+    <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1539367628448-4bc5c9d171c8?auto=format&fit=crop&w=2000&q=80" alt="Adventure group"/></div>
+    <div class="ov-soft"></div>
+    <div class="comm-content">
+      <div>
+        <div class="label-tag" style="color:rgba(255,255,255,.4);">The People</div>
+        <h1 class="comm-title">YOUR<br>TRIBE IS<br>OUT THERE.</h1>
+        <p class="comm-sub">Not about followers or likes. About finding the people who'll rope up with you on a cold Tuesday morning with no agenda except to reach the top.</p>
+        <div class="avatar-grid" id="avGrid"></div>
+      </div>
+      <div>
+        <p style="font-size:.82rem;line-height:1.9;color:rgba(255,255,255,.55);margin-bottom:14px;">We built the community around one idea: the best adventure partner isn't the most experienced — it's the one who always shows up.</p>
+        <p style="font-size:.82rem;line-height:1.9;color:rgba(255,255,255,.55);">Members across 28 countries and 80+ sports.</p>
+        <ul class="perks"><li>Adventure partner discovery across 80+ countries</li><li>Members-only secret spots map worldwide</li><li>Gear library — borrow before you buy</li><li>Monthly challenges with real stakes</li><li>Community trips, clinics, and meetups</li><li>Real-time trail & conditions reports</li></ul>
+        <button class="btn-white" style="margin-top:24px;" onclick="go('join')">Join The Community →</button>
+      </div>
+    </div>
+  </div>
+  <div class="comm-features"><div class="cf rv"><div class="cf-icon">🗺️</div><div class="cf-title">Partner Map</div><p class="cf-desc">Find adventure partners in 80+ countries filtered by sport, level, and availability.</p></div><div class="cf rv d1"><div class="cf-icon">📡</div><div class="cf-title">Live Conditions</div><p class="cf-desc">Real-time trail, wave, and weather reports from members on the ground right now.</p></div><div class="cf rv d2"><div class="cf-icon">🎒</div><div class="cf-title">Gear Library</div><p class="cf-desc">Borrow specialised gear from community members near you before committing to buy.</p></div></div>
+  <footer><div class="f-logo" onclick="go('home')">pepvoga</div><ul class="f-links"><li><span onclick="go('experiences')">Experiences</span></li></ul><div class="f-copy">© 2026 pepvoga</div></footer>
+</div>
+
+<!-- ═══════ ABOUT ═══════ -->
+<div class="page" id="pg-about">
+  <div class="about-photo-hero rv">
+    <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1527525443983-6e60c75fff46?auto=format&fit=crop&w=2000&q=80" alt="Expedition team"/></div>
+    <div class="ov-bottom"></div>
+    <div class="about-hero-text"><div class="label-tag" style="color:rgba(255,255,255,.4);">Our Story</div><h1 class="display" style="font-size:clamp(2.8rem,6vw,6rem);color:var(--white);">WE DON'T DO<br>ORDINARY.</h1></div>
+  </div>
+  <div class="about-body-section rv">
+    <div class="about-grid">
+      <div><p class="about-quote">"We built this for the ones who open <strong>Google Maps</strong> and zoom into blank terrain — just to wonder what's there."</p></div>
+      <div class="about-text"><p>pepvoga was born from a simple frustration — there was no single place where people who live for the outdoors could connect, plan, and push each other further.</p><p>We are not a travel agency. We are not a fitness app. We are a community — raw, spirited, and utterly obsessed with the world beyond the four walls of convention.</p><p>From rooftop slacklining in Tokyo to whitewater kayaking in Patagonia — if it raises your pulse and feeds your soul, it belongs here.</p></div>
+    </div>
+    <div class="values-grid"><div class="val-card rv"><div class="val-title">Go Further</div><p class="val-desc">Every objective is just a base camp for the next one. We're not interested in being comfortable.</p></div><div class="val-card rv d1"><div class="val-title">Show Up</div><p class="val-desc">The best adventure partner isn't the most talented — it's the one who always shows up.</p></div><div class="val-card rv d2"><div class="val-title">No Gatekeeping</div><p class="val-desc">Beginners and experts share the same trail. The community grows when everyone is welcome.</p></div><div class="val-card rv d3"><div class="val-title">Leave It Better</div><p class="val-desc">Every space we use, we leave cleaner than we found it. The wild should outlast all of us.</p></div></div>
+  </div>
+  <div class="team-section rv">
+    <div class="label-tag">The Team</div>
+    <h2 class="heading" style="font-size:clamp(1.8rem,3vw,2.6rem);color:var(--ink);">Built by obsessives.</h2>
+    <div class="team-grid"><div class="team-card"><div class="team-av">🧗</div><div class="team-name">Aryan S.</div><div class="team-role">Founder</div></div><div class="team-card"><div class="team-av">🏄</div><div class="team-name">Maya R.</div><div class="team-role">Community</div></div><div class="team-card"><div class="team-av">🤿</div><div class="team-name">Kai T.</div><div class="team-role">Experiences</div></div><div class="team-card"><div class="team-av">🚵</div><div class="team-name">Priya K.</div><div class="team-role">Partnerships</div></div></div>
+  </div>
+  <footer><div class="f-logo" onclick="go('home')">pepvoga</div><ul class="f-links"><li><span onclick="go('partners')">Partner With Us</span></li></ul><div class="f-copy">© 2026 pepvoga</div></footer>
+</div>
+
+<!-- ═══════ PARTNERS ═══════ -->
+<div class="page" id="pg-partners">
+  <div class="partner-hero rv">
+    <div class="ph-grid">
+      <div><div class="label-tag">For Service Providers</div><h1 class="ph-title">PARTNER<br>WITH US.</h1><p class="ph-sub">Reach 12,000 active adventure seekers already looking for exactly what you offer. No cold leads. Just warm community.</p><div style="display:flex;gap:10px;flex-wrap:wrap;"><button class="btn-dark" onclick="go('partner-apply')">Apply to Partner →</button><button class="btn-outline" onclick="go('dashboard')">Partner Login</button></div></div>
+      <div><p class="ph-right" style="font-size:.85rem;line-height:1.88;color:var(--mid);margin-bottom:14px;">Our members are obsessed. They travel specifically for sport, spend significantly on gear and experiences, and trust community recommendations over ads.</p><p style="font-size:.85rem;line-height:1.88;color:var(--mid);">When you list on pepvoga, you're not buying a banner — you're joining the conversation. Your courses, camps, and services become part of how our community explores the world.</p></div>
+    </div>
+  </div>
+  <div>
+    <div class="pt-header-row"><div><div class="label-tag">Who Can Partner</div><h2 class="heading" style="font-size:clamp(1.8rem,3vw,2.6rem);color:var(--ink);">Your category</h2></div><p style="font-style:italic;font-size:.9rem;color:var(--mid);max-width:220px;line-height:1.65;">If you serve adventurers, you belong here.</p></div>
+    <div class="pt-grid"><div class="pt-card rv" onclick="go('partner-apply')"><div class="pt-icon">🤿</div><div class="pt-name">Dive Operators</div><p class="pt-desc">Dive centres, liveaboards, PADI/SSI certified schools worldwide.</p><div class="pt-arr">Apply →</div></div><div class="pt-card rv d1" onclick="go('partner-apply')"><div class="pt-icon">🏄</div><div class="pt-name">Surf Schools</div><p class="pt-desc">Beginner lessons to advanced coaching. Surf camps and board rentals.</p><div class="pt-arr">Apply →</div></div><div class="pt-card rv d2" onclick="go('partner-apply')"><div class="pt-icon">🧗</div><div class="pt-name">Climbing &amp; Guides</div><p class="pt-desc">Indoor gyms, outdoor guiding, multi-pitch instruction.</p><div class="pt-arr">Apply →</div></div><div class="pt-card rv" onclick="go('partner-apply')"><div class="pt-icon">🪂</div><div class="pt-name">Adventure Operators</div><p class="pt-desc">Paragliding schools, skydive centres, whitewater operators.</p><div class="pt-arr">Apply →</div></div><div class="pt-card rv d1" onclick="go('partner-apply')"><div class="pt-icon">🏕️</div><div class="pt-name">Adventure Camps</div><p class="pt-desc">Multi-day expeditions, basecamp runs, adventure retreats.</p><div class="pt-arr">Apply →</div></div><div class="pt-card rv d2" onclick="go('partner-apply')"><div class="pt-icon">🎒</div><div class="pt-name">Gear &amp; Equipment</div><p class="pt-desc">Rental shops, gear libraries, specialist outfitters.</p><div class="pt-arr">Apply →</div></div></div>
+  </div>
+  <div class="why-row rv">
+    <div><div class="label-tag">Why Partner</div><h2 class="heading" style="font-size:clamp(1.8rem,3vw,2.6rem);color:var(--ink);margin-bottom:4px;">What you get</h2><ul class="why-list"><li class="why-li"><div class="why-num">01</div><div class="why-text"><strong>Qualified Audience</strong>Our members book. They show up. They come back.</div></li><li class="why-li"><div class="why-num">02</div><div class="why-text"><strong>Community Trust</strong>Listed partners are vetted. That trust transfers directly.</div></li><li class="why-li"><div class="why-num">03</div><div class="why-text"><strong>Zero Commission</strong>Members contact you directly. You own every booking.</div></li><li class="why-li"><div class="why-num">04</div><div class="why-text"><strong>Analytics Dashboard</strong>See views, saves, and enquiries in your partner portal.</div></li></ul></div>
+    <div><div class="label-tag">Onboarding Process</div><h2 class="heading" style="font-size:clamp(1.8rem,3vw,2.6rem);color:var(--ink);margin-bottom:4px;">How it works</h2><div class="steps-list"><div class="step-li"><div class="step-num">01</div><div class="step-text"><strong>Apply Online</strong>Fill the 5-step partner form. About 8 minutes.</div></div><div class="step-li"><div class="step-num">02</div><div class="step-text"><strong>Review (48hrs)</strong>Our team reviews for community fit and quality.</div></div><div class="step-li"><div class="step-num">03</div><div class="step-text"><strong>Profile Setup</strong>Access your partner portal to complete your listing.</div></div><div class="step-li"><div class="step-num">04</div><div class="step-text"><strong>Go Live</strong>Visible to all pepvoga members immediately.</div></div><div class="step-li"><div class="step-num">05</div><div class="step-text"><strong>Grow Together</strong>Featured in newsletters, posts, and curated lists.</div></div></div><button class="btn-dark" style="margin-top:24px;" onclick="go('partner-apply')">Start Application →</button></div>
+  </div>
+  <footer><div class="f-logo" onclick="go('home')">pepvoga</div><ul class="f-links"><li><span onclick="go('home')">Home</span></li><li><span onclick="go('dashboard')">Admin</span></li></ul><div class="f-copy">© 2026 pepvoga</div></footer>
+</div>
+
+<!-- ═══════ PARTNER APPLY ═══════ -->
+<div class="page" id="pg-partner-apply">
+  <div class="ob-wrap">
+    <div style="margin-bottom:40px;padding-bottom:28px;border-bottom:1px solid var(--border2);">
+      <div class="label-tag">Partner Application</div>
+      <h1 class="ob-heading">Let's get you listed.</h1>
+      <p class="ob-sub">Tell us about your business. Takes about 8 minutes. Our team reviews within 48 hours.</p>
+    </div>
+    <div class="ob-progress">
+      <div class="ob-dot-wrap cur" id="dot-1"><div class="ob-dot">1</div><span class="ob-dot-lbl">Type</span></div>
+      <div class="ob-dot-wrap" id="dot-2"><div class="ob-dot">2</div><span class="ob-dot-lbl">Business</span></div>
+      <div class="ob-dot-wrap" id="dot-3"><div class="ob-dot">3</div><span class="ob-dot-lbl">Services</span></div>
+      <div class="ob-dot-wrap" id="dot-4"><div class="ob-dot">4</div><span class="ob-dot-lbl">Capacity</span></div>
+      <div class="ob-dot-wrap" id="dot-5"><div class="ob-dot">5</div><span class="ob-dot-lbl">Review</span></div>
+    </div>
+    <!-- Step 1 -->
+    <div class="ob-step active" id="fs-1">
+      <div class="ob-step-h">What type of provider are you?</div>
+      <div class="ob-step-sub">Select the category that best describes your business.</div>
+      <div class="type-grid" id="typeGrid">
+        <div class="type-opt" data-type="Dive Operator" onclick="selType(this)"><div class="to-icon">🤿</div><div><div class="to-name">Dive Operator</div><div class="to-desc">Dive centres, liveaboards, PADI/SSI instructors</div></div></div>
+        <div class="type-opt" data-type="Surf School" onclick="selType(this)"><div class="to-icon">🏄</div><div><div class="to-name">Surf School</div><div class="to-desc">Lessons, coaching, surf camps, board rental</div></div></div>
+        <div class="type-opt" data-type="Climbing Gym / Guide" onclick="selType(this)"><div class="to-icon">🧗</div><div><div class="to-name">Climbing Gym / Guide</div><div class="to-desc">Indoor gyms, outdoor guiding, instruction</div></div></div>
+        <div class="type-opt" data-type="Adventure Operator" onclick="selType(this)"><div class="to-icon">🪂</div><div><div class="to-name">Adventure Operator</div><div class="to-desc">Paragliding, skydiving, whitewater, canyoning</div></div></div>
+        <div class="type-opt" data-type="Adventure Camp" onclick="selType(this)"><div class="to-icon">🏕️</div><div><div class="to-name">Adventure Camp</div><div class="to-desc">Multi-day expeditions, retreats, basecamp runs</div></div></div>
+        <div class="type-opt" data-type="Gear & Equipment" onclick="selType(this)"><div class="to-icon">🎒</div><div><div class="to-name">Gear & Equipment</div><div class="to-desc">Rental shops, gear libraries, specialist outfitters</div></div></div>
+      </div>
+      <div class="ob-nav"><button class="btn-outline" onclick="go('partners')">← Back</button><button class="btn-dark" onclick="nStep(2)">Continue →</button></div>
+    </div>
+    <!-- Step 2 -->
+    <div class="ob-step" id="fs-2">
+      <div class="ob-step-h">Tell us about your business</div><div class="ob-step-sub">Basic information that forms the core of your public listing.</div>
+      <div class="f-row"><label class="f-lbl">Business Name *</label><input class="f-inp" id="f-bname" placeholder="e.g. Deep Blue Dive Centre"/></div>
+      <div class="f-row-2"><div><label class="f-lbl">City / Location *</label><input class="f-inp" id="f-city" placeholder="e.g. Koh Tao, Thailand"/></div><div><label class="f-lbl">Country *</label><input class="f-inp" id="f-country" placeholder="e.g. Thailand"/></div></div>
+      <div class="f-row-2"><div><label class="f-lbl">Website</label><input class="f-inp" id="f-web" placeholder="https://"/></div><div><label class="f-lbl">Instagram Handle</label><input class="f-inp" id="f-insta" placeholder="@yourhandle"/></div></div>
+      <div class="f-row"><label class="f-lbl">Business Description *</label><textarea class="f-ta" id="f-desc" placeholder="Tell us about your business, team, and why you'd be a great fit for the pepvoga community..."></textarea></div>
+      <div class="f-row-2"><div><label class="f-lbl">Year Established</label><input class="f-inp" id="f-year" placeholder="e.g. 2018" type="number"/></div><div><label class="f-lbl">No. of Staff</label><input class="f-inp" id="f-staff" placeholder="e.g. 8" type="number"/></div></div>
+      <div class="ob-nav"><button class="btn-outline" onclick="pStep(1)">← Back</button><button class="btn-dark" onclick="nStep(3)">Continue →</button></div>
+    </div>
+    <!-- Step 3 -->
+    <div class="ob-step" id="fs-3">
+      <div class="ob-step-h">What do you offer?</div><div class="ob-step-sub">Select all services you provide.</div>
+      <label class="f-lbl" style="margin-bottom:8px;">Services Offered *</label><div class="check-grid" id="servGrid"></div>
+      <div class="f-row"><label class="f-lbl">Certifications & Accreditations</label><input class="f-inp" id="f-certs" placeholder="e.g. PADI 5-Star CDC, ISO 9001..."/></div>
+      <div class="f-row"><label class="f-lbl">Languages Spoken</label><input class="f-inp" id="f-langs" placeholder="e.g. English, Hindi, French"/></div>
+      <div class="f-row"><label class="f-lbl">Target Experience Level</label><select class="f-sel" id="f-level"><option value="">Select...</option><option>All levels welcome</option><option>Beginner to Intermediate</option><option>Intermediate to Advanced</option><option>Advanced / Expert Only</option></select></div>
+      <div class="ob-nav"><button class="btn-outline" onclick="pStep(2)">← Back</button><button class="btn-dark" onclick="nStep(4)">Continue →</button></div>
+    </div>
+    <!-- Step 4 -->
+    <div class="ob-step" id="fs-4">
+      <div class="ob-step-h">Capacity & pricing</div><div class="ob-step-sub">Help members understand what to expect when booking with you.</div>
+      <div class="f-row-2"><div><label class="f-lbl">Max Group Size</label><input class="f-inp" id="f-grp" placeholder="e.g. 8 per session"/></div><div><label class="f-lbl">Price Range</label><select class="f-sel" id="f-price"><option value="">Select...</option><option>Budget (Under $50/day)</option><option>Mid-range ($50–$150/day)</option><option>Premium ($150–$400/day)</option><option>Luxury ($400+/day)</option></select></div></div>
+      <div class="f-row"><label class="f-lbl">Operating Seasons</label><select class="f-sel" id="f-season"><option value="">Select...</option><option>Year-round</option><option>Seasonal (Summer)</option><option>Seasonal (Winter)</option><option>Monsoon dependent</option></select></div>
+      <div class="f-row"><label class="f-lbl">Booking Lead Time</label><select class="f-sel" id="f-lead"><option value="">Select...</option><option>Same-day / Walk-in welcome</option><option>24–48 hours notice</option><option>1 week advance booking</option><option>2+ weeks advance booking</option></select></div>
+      <div class="f-row"><label class="f-lbl">Contact Email *</label><input class="f-inp" id="f-email" placeholder="bookings@yourbusiness.com" type="email"/></div>
+      <div class="f-row"><label class="f-lbl">Contact Phone</label><input class="f-inp" id="f-phone" placeholder="+XX XXXXX XXXXX"/></div>
+      <div class="f-row"><label class="f-lbl">Anything else we should know?</label><textarea class="f-ta" id="f-extra" placeholder="Special requirements, seasonal notes, referral source..."></textarea></div>
+      <div class="ob-nav"><button class="btn-outline" onclick="pStep(3)">← Back</button><button class="btn-dark" onclick="nStep(5)">Review Application →</button></div>
+    </div>
+    <!-- Step 5 -->
+    <div class="ob-step" id="fs-5">
+      <div class="ob-step-h">Review & Submit</div><div class="ob-step-sub">Check everything looks right before we send your application to the team.</div>
+      <div id="reviewContent"></div>
+      <div style="margin-top:16px;padding:16px;border:2px solid var(--border2);border-radius:10px;display:flex;gap:12px;align-items:flex-start;">
+        <div class="ck-box" id="terms-box" onclick="togTerms()" style="margin-top:2px;flex-shrink:0;cursor:pointer;border-radius:4px;"> </div>
+        <div style="font-size:.75rem;line-height:1.72;color:var(--mid);">I confirm all information is accurate and agree to pepvoga's <span style="color:var(--ink);cursor:pointer;text-decoration:underline;">Partner Terms & Community Guidelines</span>. Applications are reviewed within 48 hours.</div>
+      </div>
+      <div class="ob-nav"><button class="btn-outline" onclick="pStep(4)">← Edit</button><button class="btn-dark" onclick="submitApp()">Submit Application →</button></div>
+    </div>
+    <!-- Success -->
+    <div class="ob-step" id="fs-success">
+      <div class="success-wrap"><div class="success-icon">✓</div><div class="success-title">Application Submitted</div><p class="success-sub">Your application has been received. Our team reviews every application personally and will get back to you within 48 hours.</p><div class="app-id" id="appIdDisplay">Application ID: —</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;"><button class="btn-dark" onclick="go('partners')">Back to Partners</button><button class="btn-outline" onclick="go('dashboard')">View Dashboard →</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ DASHBOARD ═══════ -->
+<div class="page" id="pg-dashboard">
+  <div id="dash-login-screen">
+    <div class="dash-login-wrap">
+      <div class="label-tag">Partner Admin</div>
+      <h1 style="font-family:'Sora',sans-serif;font-weight:800;font-size:2rem;letter-spacing:-.04em;color:var(--ink);margin-bottom:28px;">Admin Login</h1>
+      <div class="f-row"><label class="f-lbl">Password</label><input class="f-inp" id="dash-pw" type="password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')dLogin()"/></div>
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;"><button class="btn-dark" onclick="dLogin()">Login →</button><span style="font-size:.7rem;color:var(--light);">Hint: admin</span></div>
+      <div id="dash-err" style="margin-top:10px;font-size:.72rem;color:#dc2626;display:none;">Incorrect password.</div>
+    </div>
+  </div>
+  <div id="dash-main" style="display:none;">
+    <div class="dash-header"><div><div class="label-tag">Admin Dashboard</div><div class="dash-title">Partner Applications</div></div><div style="display:flex;gap:10px;align-items:center;"><span style="font-size:.7rem;color:var(--light);" id="dash-date"></span><button class="btn-outline" onclick="dLogout()">Logout</button></div></div>
+    <div class="dash-stats"><div class="ds-cell"><span class="ds-n" id="ds-total">0</span><div class="ds-l">Total</div></div><div class="ds-cell"><span class="ds-n" id="ds-pending">0</span><div class="ds-l">Pending</div></div><div class="ds-cell"><span class="ds-n" id="ds-approved">0</span><div class="ds-l">Approved</div></div><div class="ds-cell"><span class="ds-n" id="ds-review">0</span><div class="ds-l">Under Review</div></div></div>
+    <div class="dash-table-wrap"><div class="dash-filter-row"><div class="dash-filter-title">Applications</div><div class="dash-filters"><button class="df-btn active" onclick="fApps('all',this)">All</button><button class="df-btn" onclick="fApps('pending',this)">Pending</button><button class="df-btn" onclick="fApps('approved',this)">Approved</button><button class="df-btn" onclick="fApps('review',this)">Under Review</button></div></div><div id="dash-table-c"></div></div>
+  </div>
+  <div class="modal-overlay hidden" id="appModal"><div class="modal-panel" id="modalPanel"><button class="modal-close" onclick="closeModal()">✕</button><div id="modalContent"></div></div></div>
+</div>
+
+<!-- ═══════ JOIN PAGE ═══════ -->
+<div class="page" id="pg-join">
+  <section style="min-height:80vh;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:72px 48px;">
+    <div class="photo-wrap"><img src="https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=2000&q=80" alt="Hiking"/></div>
+    <div class="ov-dark"></div>
+    <div style="max-width:480px;width:100%;text-align:center;position:relative;z-index:2;">
+      <div class="label-tag" style="justify-content:center;color:rgba(255,255,255,.45);">Join the Community</div>
+      <h1 class="display" style="font-size:clamp(3rem,7vw,6rem);color:var(--white);margin-bottom:20px;">STEP<br>OUTSIDE.</h1>
+      <p style="font-size:.9rem;font-style:italic;line-height:1.75;color:rgba(255,255,255,.65);margin-bottom:36px;">12,000 people already chose this. Your next adventure partner is waiting.</p>
+      <div class="jf-wrap" style="max-width:400px;margin:0 auto 10px;"><input type="email" class="j-inp" id="j-e2" placeholder="your@email.com"/><button class="j-sub" onclick="doJoin('j-e2')">Join →</button></div>
+      <p style="font-size:.7rem;color:rgba(255,255,255,.4);">No spam. No ads. Just the wild stuff.</p>
+      <button class="btn-outline" style="margin-top:24px;border-color:rgba(255,255,255,.25);color:rgba(255,255,255,.6);" onclick="go('home')">← Back to Home</button>
+    </div>
+  </section>
+  <footer><div class="f-logo" onclick="go('home')">pepvoga</div><ul class="f-links"><li><span onclick="go('partners')">For Partners</span></li></ul><div class="f-copy">© 2026 pepvoga</div></footer>
+</div>
+
+<script>
+let fD={type:'',bname:'',city:'',country:'',web:'',insta:'',desc:'',year:'',staff:'',services:[],certs:'',langs:'',level:'',grp:'',price:'',season:'',lead:'',email:'',phone:'',extra:''};
+let termsOk=false,curFilter='all',dashIn=false;
+
+function go(pg){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('pg-'+pg);
+  if(el){el.classList.add('active');window.scrollTo(0,0);}
+  onPage(pg);
+}
+function onPage(pg){
+  setTimeout(runRv,60);
+  if(pg==='home'){buildTicker();buildPins();}
+  if(pg==='experiences'){buildOthers();}
+  if(pg==='community'){buildAvatars();}
+  if(pg==='partner-apply'){initApply();}
+  if(pg==='dashboard'){initDash();}
+  if(pg==='home'){setTimeout(()=>{const p=document.getElementById('heroPhoto');if(p)p.classList.add('zoom');},100);}
+}
+
+const cur=document.getElementById('cur');
+document.addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';});
+document.querySelectorAll('button,a,.tab,.space-card,.split-card,.pt-card,.sub-c,.oth-item,.sport-item,.type-opt,.ck-item,.nav-cta,.nav-admin,.nav-partner,.pin-item,.av').forEach(el=>{
+  el.addEventListener('mouseenter',()=>cur.classList.add('big'));
+  el.addEventListener('mouseleave',()=>cur.classList.remove('big'));
+});
+
+function buildTicker(){
+  const items=['Scuba Diving · Koh Tao','Surfing · Uluwatu','Rock Climbing · Yosemite','Paragliding · Bir Billing','Expedition Cycling · Karakoram','Kitesurfing · Tarifa','Trail Running · Chamonix','Mountaineering · Everest Base Camp','Freediving · Dahab','Ice Climbing · Patagonia'];
+  const t=document.getElementById('hticker');
+  if(t)t.innerHTML=[...items,...items].map(s=>`<span>${s}</span><span class="sep"> · </span>`).join('');
+}
+
+const dests=[{n:'Koh Tao',d:'4,820 km'},{n:'Uluwatu',d:'3,570 km'},{n:'Yosemite',d:'13,200 km'},{n:'Chamonix',d:'7,300 km'},{n:'Raja Ampat',d:'5,100 km'},{n:'Bir Billing',d:'1,200 km'},{n:'Nazaré',d:'8,900 km'},{n:'Dahab',d:'5,600 km'},{n:'Queenstown',d:'10,200 km'},{n:'Hampi',d:'1,050 km'}];
+function buildPins(){const s=document.getElementById('pinsRow');if(s)s.innerHTML=dests.map(d=>`<div class="pin-item"><div class="pin-dot"></div><div><div class="pin-name">${d.n}</div><div class="pin-dist">${d.d}</div></div></div>`).join('');}
+
+function buildOthers(){
+  const o=[{e:'🏃',n:'Trail Running'},{e:'🎿',n:'Skiing'},{e:'🏂',n:'Snowboarding'},{e:'🛶',n:'Kayaking'},{e:'🪁',n:'Kitesurfing'},{e:'🤸',n:'Slacklining'},{e:'🧊',n:'Ice Climbing'},{e:'🏹',n:'Canyoneering'},{e:'🚣',n:'Whitewater Rafting'},{e:'🏊',n:'Open Water Swim'},{e:'⛷️',n:'Ski Touring'},{e:'🌋',n:'Volcano Trek'},{e:'🛸',n:'Skydiving'},{e:'🌊',n:'Kiteboarding'},{e:'🦅',n:'Wingsuit Flying'},{e:'🏄',n:'Windsurfing'},{e:'🔦',n:'Caving'},{e:'🧭',n:'Orienteering'}];
+  const g=document.getElementById('othGrid');
+  if(g)g.innerHTML=o.map(x=>`<div class="oth-item"><div class="oth-icon">${x.e}</div><div class="oth-name">${x.n}</div></div>`).join('');
+}
+
+function buildAvatars(){
+  const s=[{e:'🧗'},{e:'🏄'},{e:'🚵'},{e:'🤿'},{e:'🪂'},{e:'🏕️'},{e:'🎿'},{e:'🛶'},{e:'🧜'},{e:'🏃'},{e:'⛺'},{e:'🔦'},{e:'🏔️'},{e:'🌊'},{e:'⛷️'},{e:'🚣'},{e:'🤸'},{e:'🧭'},{e:'🏋️'},{e:'🌏'}];
+  const g=document.getElementById('avGrid');
+  if(g)g.innerHTML=s.map(x=>`<div class="av">${x.e}</div>`).join('');
+}
+
+document.querySelectorAll('#expTabs .tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('#expTabs .tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.sp').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('ep-'+tab.dataset.p).classList.add('active');
+  });
+});
+function switchTab(s){
+  document.querySelectorAll('#expTabs .tab').forEach(t=>{t.classList.remove('active');if(t.dataset.p===s)t.classList.add('active');});
+  document.querySelectorAll('.sp').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('ep-'+s);if(el)el.classList.add('active');
+}
+
+function runRv(){
+  const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');});},{threshold:0.07});
+  document.querySelectorAll('.rv:not(.in)').forEach(el=>obs.observe(el));
+}
+
+function doJoin(id){const i=document.getElementById(id);if(i&&i.value.includes('@')){i.value='';i.placeholder='✓ Welcome to pepvoga';}}
+
+const SVC={'Dive Operator':['Open Water Courses','Advanced Courses','Rescue Diver','Tech Diving','Cave Diving','Wreck Diving','Reef Dives','Liveaboard','Equipment Rental'],'Surf School':['Beginner Lessons','Intermediate Coaching','Surf Camps','Board Rental','Video Analysis','Fitness Training'],'Climbing Gym / Guide':['Indoor Bouldering','Sport Climbing','Lead Climbing','Multi-pitch Guiding','Alpine Routes','Mountaineering'],'Adventure Operator':['Tandem Paragliding','Solo P2 Courses','Skydiving','Whitewater Rafting','Canyoning','Via Ferrata'],'Adventure Camp':['Day Expeditions','Multi-day Treks','Basecamp Runs','Wilderness Survival','Navigation Skills','First Aid Training'],'Gear & Equipment':['Daily Rental','Weekly Rental','Sales','Custom Fitting','Equipment Servicing','Guided Tours with Gear']};
+const SVC_DEF=['Group Sessions','Private Sessions','Corporate Bookings','Gift Vouchers','Photography / Video','Transfer Services'];
+function initApply(){showStep(1);buildServGrid();}
+function selType(el){document.querySelectorAll('.type-opt').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');fD.type=el.dataset.type;}
+function buildServGrid(){const g=document.getElementById('servGrid');if(!g)return;const opts=[...(SVC[fD.type||'Dive Operator']||[]),...SVC_DEF];g.innerHTML=opts.map(s=>`<div class="ck-item" onclick="togSvc(this,'${s}')"><div class="ck-box">✓</div><div class="ck-lbl">${s}</div></div>`).join('');}
+function togSvc(el,s){el.classList.toggle('checked');if(el.classList.contains('checked')){if(!fD.services.includes(s))fD.services.push(s);}else{fD.services=fD.services.filter(x=>x!==s);}}
+function showStep(n){document.querySelectorAll('.ob-step').forEach(s=>s.classList.remove('active'));const el=document.getElementById('fs-'+n);if(el)el.classList.add('active');for(let i=1;i<=5;i++){const d=document.getElementById('dot-'+i);if(!d)continue;d.classList.remove('cur','done');if(i<n)d.classList.add('done');else if(i===n)d.classList.add('cur');}}
+function nStep(n){if(n===2&&!fD.type){alert('Please select a business type.');return;}if(n===3){fD.bname=v('f-bname');fD.city=v('f-city');fD.country=v('f-country');if(!fD.bname||!fD.city){alert('Please fill in Business Name and Location.');return;}fD.web=v('f-web');fD.insta=v('f-insta');fD.desc=v('f-desc');fD.year=v('f-year');fD.staff=v('f-staff');buildServGrid();}if(n===4){fD.certs=v('f-certs');fD.langs=v('f-langs');fD.level=v('f-level');}if(n===5){fD.grp=v('f-grp');fD.price=v('f-price');fD.season=v('f-season');fD.lead=v('f-lead');fD.email=v('f-email');fD.phone=v('f-phone');fD.extra=v('f-extra');if(!fD.email){alert('Please enter a contact email.');return;}buildReview();}showStep(n);}
+function pStep(n){showStep(n);}
+function v(id){return document.getElementById(id)?.value||'';}
+function buildReview(){const rc=document.getElementById('reviewContent');if(!rc)return;const svc=fD.services.length?fD.services.join(', '):'None selected';rc.innerHTML=`<div class="rev-block"><div class="rev-t">Business Type</div><div class="rev-row"><span class="rev-k">Category</span><span class="rev-v">${fD.type||'—'}</span></div></div><div class="rev-block"><div class="rev-t">Business Info</div><div class="rev-row"><span class="rev-k">Name</span><span class="rev-v">${fD.bname||'—'}</span></div><div class="rev-row"><span class="rev-k">Location</span><span class="rev-v">${fD.city}, ${fD.country}</span></div><div class="rev-row"><span class="rev-k">Website</span><span class="rev-v">${fD.web||'—'}</span></div></div><div class="rev-block"><div class="rev-t">Services</div><div class="rev-row"><span class="rev-k">Offerings</span><span class="rev-v">${svc.substring(0,80)}${svc.length>80?'...':''}</span></div><div class="rev-row"><span class="rev-k">Level</span><span class="rev-v">${fD.level||'—'}</span></div></div><div class="rev-block"><div class="rev-t">Contact</div><div class="rev-row"><span class="rev-k">Email</span><span class="rev-v">${fD.email||'—'}</span></div><div class="rev-row"><span class="rev-k">Price Range</span><span class="rev-v">${fD.price||'—'}</span></div></div>`;}
+function togTerms(){termsOk=!termsOk;const b=document.getElementById('terms-box');if(b){b.textContent=termsOk?'✓':' ';b.style.background=termsOk?'var(--ink)':'';b.style.borderColor=termsOk?'var(--ink)':'var(--border)';b.style.color=termsOk?'var(--white)':'';}}
+function submitApp(){if(!termsOk){alert('Please accept the terms to submit.');return;}const id='PV-'+Date.now().toString(36).toUpperCase();const app={id,status:'pending',submittedAt:new Date().toISOString(),...JSON.parse(JSON.stringify(fD))};const apps=JSON.parse(localStorage.getItem('pv_apps')||'[]');apps.push(app);localStorage.setItem('pv_apps',JSON.stringify(apps));document.getElementById('appIdDisplay').textContent='Application ID: '+id;showStep('success');fD={type:'',bname:'',city:'',country:'',web:'',insta:'',desc:'',year:'',staff:'',services:[],certs:'',langs:'',level:'',grp:'',price:'',season:'',lead:'',email:'',phone:'',extra:''};termsOk=false;}
+
+function initDash(){document.getElementById('dash-date').textContent=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});if(dashIn){document.getElementById('dash-login-screen').style.display='none';document.getElementById('dash-main').style.display='block';loadDash();}else{document.getElementById('dash-login-screen').style.display='block';document.getElementById('dash-main').style.display='none';}}
+function dLogin(){if((document.getElementById('dash-pw')?.value||'')==='admin'){dashIn=true;document.getElementById('dash-login-screen').style.display='none';document.getElementById('dash-main').style.display='block';loadDash();document.getElementById('dash-err').style.display='none';}else{document.getElementById('dash-err').style.display='block';}}
+function dLogout(){dashIn=false;document.getElementById('dash-login-screen').style.display='block';document.getElementById('dash-main').style.display='none';document.getElementById('dash-pw').value='';}
+function loadDash(f){f=f||curFilter;curFilter=f;let apps=JSON.parse(localStorage.getItem('pv_apps')||'[]');if(!apps.length){apps=[{id:'PV-SAMPLE1',type:'Dive Operator',bname:'Blue Horizon Diving',city:'Koh Tao',country:'Thailand',email:'info@bluehorizon.th',status:'approved',submittedAt:new Date(Date.now()-3*86400000).toISOString(),services:['Open Water Courses','Reef Dives'],level:'All levels welcome',price:'Mid-range ($50–$150/day)',season:'Year-round',desc:'Award-winning PADI 5-Star dive centre on Koh Tao.',certs:'PADI 5-Star CDC',langs:'English, Thai',grp:'8',web:'https://bluehorizon.th',insta:'@bluehorizon'},{id:'PV-SAMPLE2',type:'Surf School',bname:'Swell Seekers Bali',city:'Canggu',country:'Indonesia',email:'hello@swellseekers.id',status:'pending',submittedAt:new Date(Date.now()-1*86400000).toISOString(),services:['Beginner Lessons','Board Rental'],level:'Beginner to Intermediate',price:'Budget (Under $50/day)',season:'Year-round',desc:'Fun surf school in Canggu run by local surfers.',certs:'ISA Certified',langs:'English, Indonesian',grp:'6',web:'https://swellseekers.id',insta:'@swellseekersbali'},{id:'PV-SAMPLE3',type:'Climbing Gym / Guide',bname:'Vertical Ground',city:'Bengaluru',country:'India',email:'climb@verticalground.in',status:'review',submittedAt:new Date(Date.now()-2*86400000).toISOString(),services:['Indoor Bouldering','Multi-pitch Guiding'],level:'All levels welcome',price:'Budget (Under $50/day)',season:'Year-round',desc:"Bangalore's premier climbing gym.",certs:'UIAA Affiliated',langs:'English, Kannada',grp:'12',web:'https://verticalground.in',insta:'@verticalground_blr'}];localStorage.setItem('pv_apps',JSON.stringify(apps));}
+document.getElementById('ds-total').textContent=apps.length;document.getElementById('ds-pending').textContent=apps.filter(a=>a.status==='pending').length;document.getElementById('ds-approved').textContent=apps.filter(a=>a.status==='approved').length;document.getElementById('ds-review').textContent=apps.filter(a=>a.status==='review').length;
+const filtered=f==='all'?apps:apps.filter(a=>a.status===f);renderTable(filtered);}
+function renderTable(apps){const c=document.getElementById('dash-table-c');if(!apps.length){c.innerHTML=`<div class="empty"><div class="empty-t">No Applications</div><div class="empty-s">No applications match this filter.</div></div>`;return;}c.innerHTML=`<table class="dash-table"><thead><tr><th>ID</th><th>Business</th><th>Type</th><th>Location</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead><tbody>${apps.map(a=>`<tr><td style="color:var(--light);font-size:.68rem;">${a.id}</td><td><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:.78rem;color:var(--ink);">${a.bname||'—'}</div><div style="font-size:.65rem;color:var(--light);">${a.email||''}</div></td><td style="font-size:.75rem;">${a.type||'—'}</td><td style="font-size:.75rem;">${a.city||'—'}, ${a.country||''}</td><td style="font-size:.7rem;color:var(--light);">${new Date(a.submittedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</td><td><span class="s-pill ${a.status}">${a.status.charAt(0).toUpperCase()+a.status.slice(1)}</span></td><td><button class="da-btn" onclick="viewApp('${a.id}')">View</button>${a.status!=='approved'?`<button class="da-btn" onclick="appApp('${a.id}')">Approve</button>`:''} ${a.status==='pending'?`<button class="da-btn" onclick="revApp('${a.id}')">Review</button>`:''}</td></tr>`).join('')}</tbody></table>`;}
+function fApps(f,btn){document.querySelectorAll('.df-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');loadDash(f);}
+function appApp(id){const apps=JSON.parse(localStorage.getItem('pv_apps')||'[]');const a=apps.find(x=>x.id===id);if(a)a.status='approved';localStorage.setItem('pv_apps',JSON.stringify(apps));loadDash();}
+function revApp(id){const apps=JSON.parse(localStorage.getItem('pv_apps')||'[]');const a=apps.find(x=>x.id===id);if(a)a.status='review';localStorage.setItem('pv_apps',JSON.stringify(apps));loadDash();}
+function viewApp(id){const apps=JSON.parse(localStorage.getItem('pv_apps')||'[]');const a=apps.find(x=>x.id===id);if(!a)return;const svc=Array.isArray(a.services)?a.services.join(', '):'—';document.getElementById('modalContent').innerHTML=`<div style="margin-bottom:20px;padding-right:36px;"><div class="modal-bname">${a.bname||'—'}</div><div class="modal-type">${a.type||'—'} · <span class="s-pill ${a.status}">${a.status}</span></div></div><div class="modal-sec"><div class="modal-sec-t">Business Details</div><div class="mf-k">Location</div><div class="mf-v">${a.city||'—'}, ${a.country||''}</div><div class="mf-k">Website</div><div class="mf-v">${a.web||'—'}</div><div class="mf-k">Description</div><div class="mf-v">${a.desc||'—'}</div></div><div class="modal-sec"><div class="modal-sec-t">Services</div><div class="mf-k">Offerings</div><div class="mf-v">${svc}</div><div class="mf-k">Level</div><div class="mf-v">${a.level||'—'}</div></div><div class="modal-sec"><div class="modal-sec-t">Contact</div><div class="mf-k">Email</div><div class="mf-v">${a.email||'—'}</div><div class="mf-k">Price Range</div><div class="mf-v">${a.price||'—'}</div></div><div class="modal-actions">${a.status!=='approved'?`<button class="btn-dark" onclick="appApp('${a.id}');closeModal()">Approve Partner</button>`:'<button class="btn-outline" disabled>Approved ✓</button>'}${a.status==='pending'?`<button class="btn-outline" onclick="revApp('${a.id}');closeModal()">Mark Review</button>`:''}</div>`;document.getElementById('appModal').classList.remove('hidden');}
+function closeModal(){document.getElementById('appModal').classList.add('hidden');}
+document.getElementById('appModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+go('home');
+</script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+// pepvoga — adventure stays & experiences marketplace
+// Prisma 7 schema. Target: Supabase Postgres (prod) / Prisma Postgres (local dev).
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Prisma 7: connection URLs live in prisma.config.ts (CLI/migrations) and
+  // are passed to the PrismaClient via a driver adapter at runtime (src/lib/db.ts).
+}
+
+// ───────────────────────────── Enums ─────────────────────────────
+
+enum Role {
+  USER
+  OWNER
+  ADMIN
+}
+
+/// The three top-level "Spaces" from the brand IA.
+enum Space {
+  WILDERNESS // Wilderness & Mountains
+  OCEAN // Ocean & Open Water
+  URBAN // Crazy & Urban Edges
+}
+
+enum ListingType {
+  STAY
+  EXPERIENCE
+}
+
+enum ListingStatus {
+  DRAFT
+  PENDING
+  PUBLISHED
+  REJECTED
+  SUSPENDED
+}
+
+/// Lifecycle of a provider/partner onboarding application.
+enum OwnerStatus {
+  PENDING
+  REVIEW
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum PriceUnit {
+  PER_NIGHT
+  PER_PERSON
+  PER_SESSION
+  PER_DAY
+  PER_GROUP
+}
+
+enum BookingStatus {
+  PENDING // requested, awaiting owner
+  CONFIRMED
+  DECLINED
+  CANCELLED
+  COMPLETED
+  EXPIRED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PROCESSING
+  PAID
+  REFUNDED
+  FAILED
+}
+
+enum ExperienceLevel {
+  ALL
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+// ────────────────────────── Auth.js models ──────────────────────────
+
+model User {
+  id             String    @id @default(cuid())
+  name           String?
+  email          String    @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String? // null for OAuth-only accounts
+  role           Role      @default(USER)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+  owner    Owner?
+  bookings Booking[]
+  reviews  Review[]
+  saved    SavedListing[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ─────────────────────────── Domain models ───────────────────────────
+
+/// A vetted service provider (dive op, surf school, camp, homestay, …).
+/// A pending Owner row IS the partner application moderated in the admin.
+model Owner {
+  id              String      @id @default(cuid())
+  userId          String      @unique
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessName    String
+  slug            String      @unique
+  category        String // "Dive Operator", "Surf School", …
+  description     String
+  city            String
+  country         String
+  website         String?
+  instagram       String?
+  yearEstablished Int?
+  staffCount      Int?
+  certifications  String?
+  languages       String?
+  targetLevel     String?
+  services        String[]
+  maxGroupSize    String?
+  priceRange      String?
+  seasons         String?
+  leadTime        String?
+  contactEmail    String
+  contactPhone    String?
+  extraNotes      String?
+  logoUrl         String?
+  status          OwnerStatus @default(PENDING)
+  submittedAt     DateTime    @default(now())
+  reviewedAt      DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  listings Listing[]
+
+  @@index([status])
+  @@map("owners")
+}
+
+model Listing {
+  id              String          @id @default(cuid())
+  ownerId         String
+  owner           Owner           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  type            ListingType
+  status          ListingStatus   @default(DRAFT)
+  title           String
+  slug            String          @unique
+  summary         String
+  description     String
+  space           Space
+  sport           String? // "Scuba Diving", "Rock Climbing", …
+  // location
+  city            String
+  country         String
+  region          String?
+  latitude        Float?
+  longitude       Float?
+  // pricing (minor units, e.g. paise/cents)
+  priceCents      Int
+  currency        String          @default("INR")
+  priceUnit       PriceUnit
+  // capacity / specifics
+  maxGuests       Int? // stays
+  minNights       Int?            @default(1) // stays
+  maxGroupSize    Int? // experiences
+  durationMinutes Int? // experiences
+  level           ExperienceLevel @default(ALL)
+  // media & meta
+  images          String[]
+  amenities       String[]
+  highlights      String[]
+  included        String[]
+  // ratings (denormalized for fast listing cards)
+  ratingAvg       Float           @default(0)
+  ratingCount     Int             @default(0)
+  featured        Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  availability Availability[]
+  bookings     Booking[]
+  reviews      Review[]
+  saved        SavedListing[]
+
+  @@index([type, status])
+  @@index([space])
+  @@index([city])
+  @@index([featured])
+  @@map("listings")
+}
+
+/// Unified inventory: a row per stay-night or per experience-slot.
+/// Stays → startTime null, capacity = rooms/units.
+/// Experiences → startTime "HH:mm", capacity = seats per slot.
+model Availability {
+  id                 String   @id @default(cuid())
+  listingId          String
+  listing            Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  date               DateTime @db.Date
+  startTime          String?
+  capacity           Int      @default(1)
+  booked             Int      @default(0)
+  priceCentsOverride Int?
+  isBlocked          Boolean  @default(false)
+
+  @@unique([listingId, date, startTime])
+  @@index([listingId, date])
+  @@map("availability")
+}
+
+model Booking {
+  id             String        @id @default(cuid())
+  code           String        @unique // human-friendly e.g. PV-XXXXXX
+  listingId      String
+  listing        Listing       @relation(fields: [listingId], references: [id])
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  ownerId        String // denormalized for owner dashboards
+  startDate      DateTime
+  endDate        DateTime? // stays (checkout); null for single-slot experiences
+  startTime      String? // experiences
+  guests         Int           @default(1)
+  unitPriceCents Int
+  totalCents     Int
+  currency       String        @default("INR")
+  status         BookingStatus @default(PENDING)
+  paymentStatus  PaymentStatus @default(UNPAID)
+  guestNote      String?
+  ownerNote      String?
+  confirmedAt    DateTime?
+  cancelledAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  review  Review?
+  payment Payment?
+
+  @@index([userId])
+  @@index([ownerId])
+  @@index([listingId])
+  @@index([status])
+  @@map("bookings")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  bookingId String   @unique
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  rating    Int // 1..5
+  title     String?
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([listingId])
+  @@map("reviews")
+}
+
+/// Ready for phase-2 payments (Razorpay India / Stripe global). Unused in v1.
+model Payment {
+  id                String        @id @default(cuid())
+  bookingId         String        @unique
+  booking           Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  provider          String // "razorpay" | "stripe"
+  providerOrderId   String?
+  providerPaymentId String?
+  amountCents       Int
+  currency          String        @default("INR")
+  status            PaymentStatus @default(UNPAID)
+  method            String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@map("payments")
+}
+
+model SavedListing {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, listingId])
+  @@map("saved_listings")
+}
+
+/// Email capture from the public "Join" / early-access forms.
+model NewsletterSignup {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  source    String?
+  createdAt DateTime @default(now())
+
+  @@map("newsletter_signups")
+}
