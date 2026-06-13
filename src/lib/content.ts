@@ -287,6 +287,8 @@ export const PROVIDER_CATEGORIES: ProviderCategory[] = [
   { type: "Adventure Operator", icon: "🪂", desc: "Paragliding schools, skydive centres, whitewater operators." },
   { type: "Adventure Camp", icon: "🏕️", desc: "Multi-day expeditions, basecamp runs, adventure retreats." },
   { type: "Gear & Equipment", icon: "🎒", desc: "Rental shops, gear libraries, specialist outfitters." },
+  { type: "Stay / Homestay Host", icon: "🏠", desc: "Homestays, cabins, lodges, camps and glamping for adventurers." },
+  { type: "Independent Guide / Trainer", icon: "🧭", desc: "Solo guides, coaches and instructors running trips or clinics on the side." },
 ];
 
 export const SERVICES_BY_CATEGORY: Record<string, string[]> = {
@@ -296,6 +298,8 @@ export const SERVICES_BY_CATEGORY: Record<string, string[]> = {
   "Adventure Operator": ["Tandem Paragliding", "Solo P2 Courses", "Skydiving", "Whitewater Rafting", "Canyoning", "Via Ferrata"],
   "Adventure Camp": ["Day Expeditions", "Multi-day Treks", "Basecamp Runs", "Wilderness Survival", "Navigation Skills", "First Aid Training"],
   "Gear & Equipment": ["Daily Rental", "Weekly Rental", "Sales", "Custom Fitting", "Equipment Servicing", "Guided Tours with Gear"],
+  "Stay / Homestay Host": ["Private Room", "Whole Place", "Glamping", "Camp / Tents", "Dorm / Hostel", "Breakfast Included"],
+  "Independent Guide / Trainer": ["Private Coaching", "Guided Trips", "Skills Clinics", "Workshops", "Beginner Lessons", "Custom Itineraries"],
 };
 
 export const SERVICES_DEFAULT = ["Group Sessions", "Private Sessions", "Corporate Bookings", "Gift Vouchers", "Photography / Video", "Transfer Services"];

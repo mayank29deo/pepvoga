@@ -234,6 +234,85 @@ INSERT INTO "newsletter_signups" (id, email, source, "createdAt") VALUES
   ('n_2','early2@example.com','seed', now())
 ON CONFLICT DO NOTHING;
 
+-- ── Additional demo providers, stays & experiences (richer catalog) ──────
+INSERT INTO "users" (id, name, email, "hashedPassword", role, "createdAt", "updatedAt") VALUES
+  ('u_alps',  'Élise Laurent', 'alps@pepvoga.com',      '$2b$10$7exAvn2.KUbuGSsBzfVtLe.viXdumeVTcUYPthlBiv7iSCQOgbh4W', 'OWNER', now(), now()),
+  ('u_kite',  'Diego Morales', 'kite@pepvoga.com',      '$2b$10$7exAvn2.KUbuGSsBzfVtLe.viXdumeVTcUYPthlBiv7iSCQOgbh4W', 'OWNER', now(), now()),
+  ('u_tokyo', 'Yuki Tanaka',   'tokyo@pepvoga.com',     '$2b$10$7exAvn2.KUbuGSsBzfVtLe.viXdumeVTcUYPthlBiv7iSCQOgbh4W', 'OWNER', now(), now()),
+  ('u_raja',  'Sari Wijaya',   'raja@pepvoga.com',      '$2b$10$7exAvn2.KUbuGSsBzfVtLe.viXdumeVTcUYPthlBiv7iSCQOgbh4W', 'OWNER', now(), now()),
+  ('u_pata',  'Mateo Fuentes', 'patagonia@pepvoga.com', '$2b$10$7exAvn2.KUbuGSsBzfVtLe.viXdumeVTcUYPthlBiv7iSCQOgbh4W', 'OWNER', now(), now())
+ON CONFLICT DO NOTHING;
+
+INSERT INTO "owners" (id,"userId","businessName",slug,category,description,city,country,instagram,certifications,languages,services,"contactEmail",status,"submittedAt","reviewedAt","createdAt","updatedAt") VALUES
+  ('o_alps','u_alps','Chamonix Alpine Guides','chamonix-alpine-guides','Climbing Gym / Guide',$$IFMGA-certified mountain guides for alpine climbs, ice routes and ski touring around Mont Blanc.$$,'Chamonix','France','@chamonixguides','IFMGA Guides','English, French',ARRAY['Alpine Routes','Ice Climbing','Ski Touring','Mountaineering'],'alps@pepvoga.com','APPROVED',now(),now(),now(),now()),
+  ('o_kite','u_kite','Tarifa Kite Co.','tarifa-kite-co','Surf School',$$Kitesurfing lessons and downwinders on the wind-blessed beaches of Tarifa.$$,'Tarifa','Spain','@tarifakite','IKO Certified','English, Spanish',ARRAY['Kitesurfing Lessons','Board Rental','Downwinders'],'kite@pepvoga.com','APPROVED',now(),now(),now(),now()),
+  ('o_tokyo','u_tokyo','Tokyo Vertical','tokyo-vertical','Independent Guide / Trainer',$$Urban adventures across Tokyo — rooftop lines, night bouldering and hidden-city exploration.$$,'Tokyo','Japan','@tokyovertical',NULL,'English, Japanese',ARRAY['Urban Exploration','Bouldering','Night Tours'],'tokyo@pepvoga.com','APPROVED',now(),now(),now(),now()),
+  ('o_raja','u_raja','Raja Ampat Liveaboards','raja-ampat-liveaboards','Dive Operator',$$Small-group liveaboard safaris through the richest reefs on Earth.$$,'Raja Ampat','Indonesia','@rajaliveaboard','PADI / SSI','English, Indonesian',ARRAY['Liveaboard','Reef Dives','Snorkeling','Wreck Diving'],'raja@pepvoga.com','APPROVED',now(),now(),now(),now()),
+  ('o_pata','u_pata','Patagonia Trails','patagonia-trails','Adventure Camp',$$Guided treks and trail-running camps through Torres del Paine and the Patagonian wild.$$,'Torres del Paine','Chile','@patagoniatrails','AEGM Guides','English, Spanish',ARRAY['Trekking','Trail Running','Camping','Navigation'],'patagonia@pepvoga.com','APPROVED',now(),now(),now(),now())
+ON CONFLICT DO NOTHING;
+
+INSERT INTO "listings" (id,"ownerId",type,status,title,slug,summary,description,space,sport,city,country,region,"priceCents",currency,"priceUnit","maxGuests","minNights","maxGroupSize","durationMinutes",level,images,amenities,highlights,included,"ratingAvg","ratingCount",featured,"createdAt","updatedAt") VALUES
+  ('l_iceclimb','o_alps','EXPERIENCE','PUBLISHED','Ice Climbing Day — Chamonix','ice-climbing-day-chamonix',
+   $$Swing tools into blue alpine ice beneath Mont Blanc with an IFMGA guide.$$,
+   $$A full day on frozen waterfalls and couloirs above Chamonix. Your guide handles ropes, screws and route choice; you bring the stoke. Boots, crampons, axes and helmet included — suitable for fit beginners and improvers.$$,
+   'WILDERNESS','Ice Climbing','Chamonix','France','French Alps',18000,'EUR','PER_PERSON',NULL,NULL,4,480,'INTERMEDIATE',
+   ARRAY['https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1400&q=85'],
+   ARRAY[]::text[],ARRAY['IFMGA guide','All technical gear','Mont Blanc views'],ARRAY['Crampons & axes','Helmet & harness','Certified guide'],0,0,false,now(),now()),
+  ('l_chalet','o_alps','STAY','PUBLISHED','Timber Alpine Chalet — Chamonix','timber-alpine-chalet-chamonix',
+   $$A warm wood chalet with Mont Blanc from the balcony and a sauna for tired legs.$$,
+   $$Sleeps six in a classic Savoyard chalet — exposed beams, a crackling stove, ski-locker by the door, and a wood-fired sauna. Ten minutes from the Aiguille du Midi lift; the perfect basecamp for a climbing or ski week.$$,
+   'WILDERNESS',NULL,'Chamonix','France','French Alps',12000,'EUR','PER_NIGHT',6,2,NULL,NULL,'ALL',
+   ARRAY['https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1400&q=85','https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80'],
+   ARRAY['Sauna','Wood stove','Ski locker','Mountain views','Kitchen','Parking'],ARRAY[]::text[],ARRAY[]::text[],0,0,false,now(),now()),
+  ('l_kite','o_kite','EXPERIENCE','PUBLISHED','Kitesurfing Starter Course — Tarifa','kitesurfing-starter-course-tarifa',
+   $$Three hours on Europe's windiest beach — from zero to riding the bar.$$,
+   $$Tarifa's steady Levante wind makes it the best place in Europe to learn. IKO-certified instructors, radio helmets and the latest gear get you controlling the kite and water-starting fast. Small groups, big grins.$$,
+   'OCEAN','Kitesurfing','Tarifa','Spain','Costa de la Luz',9000,'EUR','PER_PERSON',NULL,NULL,6,180,'BEGINNER',
+   ARRAY['https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=1400&q=85'],
+   ARRAY[]::text[],ARRAY['IKO instructors','Radio helmets','All gear included'],ARRAY['Kite & board','Wetsuit','Insurance'],4.8,1,false,now(),now()),
+  ('l_rooftop','o_tokyo','EXPERIENCE','PUBLISHED','After-Dark Tokyo Rooftop Walk','after-dark-tokyo-rooftop-walk',
+   $$See the city from the in-between places — rooftops, alleys and neon backstreets.$$,
+   $$A small-group night walk through the Tokyo most visitors never see: service rooftops, lantern-lit alleys, and viewpoints stacked above the neon. Led by local explorers who know exactly where, and how, to look.$$,
+   'URBAN','Urban Exploration','Tokyo','Japan','Kanto',6500,'USD','PER_PERSON',NULL,NULL,8,180,'ALL',
+   ARRAY['https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=1400&q=85'],
+   ARRAY[]::text[],ARRAY['Local explorer guide','Hidden viewpoints','Small group'],ARRAY['Guide','Transit between spots'],0,0,false,now(),now()),
+  ('l_loft','o_tokyo','STAY','PUBLISHED','Neon-View Loft — Shibuya','neon-view-loft-shibuya',
+   $$A compact designer loft above the Shibuya buzz, floor-to-ceiling city lights.$$,
+   $$Minimalist concrete-and-timber loft a few minutes from the Scramble. Big windows, fast Wi-Fi, a proper coffee setup, and the whole electric city laid out below you. Ideal for an urban-adventure weekend.$$,
+   'URBAN',NULL,'Tokyo','Japan','Kanto',9000,'USD','PER_NIGHT',2,1,NULL,NULL,'ALL',
+   ARRAY['https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1400&q=85'],
+   ARRAY['Wi-Fi','City view','Coffee bar','Self check-in','Air conditioning'],ARRAY[]::text[],ARRAY[]::text[],0,0,false,now(),now()),
+  ('l_liveaboard','o_raja','EXPERIENCE','PUBLISHED','7-Night Liveaboard Safari — Raja Ampat','7-night-liveaboard-safari-raja-ampat',
+   $$Up to four dives a day across the most biodiverse reefs on the planet.$$,
+   $$A week aboard a traditional phinisi, chasing mantas, wobbegongs and walls of fish through Raja Ampat. Nitrox, expert dive guides, en-suite cabins and a chef who somehow tops every meal. The trip of a diving lifetime.$$,
+   'OCEAN','Scuba Diving','Raja Ampat','Indonesia','West Papua',240000,'USD','PER_PERSON',NULL,NULL,12,1440,'ADVANCED',
+   ARRAY['https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?auto=format&fit=crop&w=1400&q=85','https://images.unsplash.com/photo-1682687982501-1e58ab814714?auto=format&fit=crop&w=1200&q=80'],
+   ARRAY[]::text[],ARRAY['Up to 4 dives/day','Nitrox included','En-suite cabins'],ARRAY['All dives & gear','Full board','Airport transfers'],5,1,true,now(),now()),
+  ('l_trek','o_pata','EXPERIENCE','PUBLISHED','W-Trek Trail Camp — Torres del Paine','w-trek-trail-camp-torres-del-paine',
+   $$Five days running and hiking the iconic W through Patagonia's granite towers.$$,
+   $$Cover the classic W route light and fast, with a guide, hut-to-hut logistics and dinners handled. Granite spires, glacial lakes, and Patagonian wind that makes every summit earned. For fit hikers and trail runners.$$,
+   'WILDERNESS','Trail Running','Torres del Paine','Chile','Magallanes',4500,'USD','PER_PERSON',NULL,NULL,10,1440,'INTERMEDIATE',
+   ARRAY['https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1400&q=85'],
+   ARRAY[]::text[],ARRAY['Guided W route','Hut logistics','All dinners'],ARRAY['Mountain guide','Refugio nights','Park permits'],0,0,true,now(),now()),
+  ('l_refugio','o_pata','STAY','PUBLISHED','Mountain Refugio Bunk — Paine','mountain-refugio-bunk-paine',
+   $$A cozy bunk and hot meal inside the national park, steps from the trailhead.$$,
+   $$Simple, warm and perfectly placed — a bunk in a classic Patagonian refugio with hearty dinners, hot showers and a drying room for wet gear. Wake up already inside the park, trail at your door.$$,
+   'WILDERNESS',NULL,'Torres del Paine','Chile','Magallanes',8000,'USD','PER_NIGHT',4,1,NULL,NULL,'ALL',
+   ARRAY['https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1200&q=80'],
+   ARRAY['Hot meals','Hot showers','Drying room','In-park location'],ARRAY[]::text[],ARRAY[]::text[],0,0,false,now(),now())
+ON CONFLICT DO NOTHING;
+
+-- Extra completed bookings + reviews for two of the new listings
+INSERT INTO "bookings" (id,code,"listingId","userId","ownerId","startDate","endDate","startTime",guests,"unitPriceCents","totalCents",currency,status,"paymentStatus","confirmedAt","createdAt","updatedAt") VALUES
+  ('b_seed2','PV-SEED2','l_liveaboard','u_traveler','o_raja', now() - interval '30 days', NULL, '09:00', 1, 240000, 240000, 'USD','COMPLETED','PAID', now() - interval '31 days', now(), now()),
+  ('b_seed3','PV-SEED3','l_kite','u_traveler','o_kite', now() - interval '12 days', NULL, '09:00', 1, 9000, 9000, 'EUR','COMPLETED','PAID', now() - interval '13 days', now(), now())
+ON CONFLICT DO NOTHING;
+
+INSERT INTO "reviews" (id,"listingId","userId","bookingId",rating,title,body,"createdAt") VALUES
+  ('r_seed2','l_liveaboard','u_traveler','b_seed2',5,'Best week of my life',$$Four dives a day in the most insane reefs I have ever seen. Crew, food, cabins — flawless. Worth every cent.$$, now()),
+  ('r_seed3','l_kite','u_traveler','b_seed3',5,'Up and riding by day three',$$Patient instructors and perfect wind. Went from never having flown a kite to riding short stretches. So much fun.$$, now())
+ON CONFLICT DO NOTHING;
+
 -- Availability for the next 45 days
 --   experiences → a 09:00 slot/day;  stays → per-night inventory
 INSERT INTO "availability" (id,"listingId",date,"startTime",capacity,booked,"isBlocked")

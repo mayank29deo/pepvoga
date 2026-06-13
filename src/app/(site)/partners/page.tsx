@@ -23,8 +23,9 @@ export default function PartnersPage() {
               WITH US.
             </h1>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-mid">
-              Reach 12,000 active adventure seekers already looking for exactly
-              what you offer. No cold leads — just warm community.
+              Run a dive centre, host a mountain cabin, or guide trips on the
+              side — list your stays and experiences and reach 12,000 adventurers
+              already looking for what you offer.
             </p>
             <div className="mt-6 flex flex-wrap gap-2.5">
               <Link href="/partners/apply" className={buttonClasses("dark", "md")}>
