@@ -7,7 +7,14 @@ import { Menu, X, LayoutDashboard } from "lucide-react";
 import { NAV_LINKS } from "@/lib/content";
 import { buttonClasses } from "@/components/ui/button";
 import { logout } from "@/lib/actions/auth";
+import { DEMO_MODE } from "@/lib/demo";
 import { cn } from "@/lib/utils";
+
+const DEMO_VIEWS = [
+  { href: "/account", label: "Traveller" },
+  { href: "/owner", label: "Host" },
+  { href: "/admin", label: "Admin" },
+];
 
 type NavUser = { name: string | null; role: string } | null;
 
@@ -52,7 +59,27 @@ export function Navbar({ user }: { user: NavUser }) {
         </ul>
 
         <div className="hidden items-center gap-2 md:flex">
-          {user ? (
+          {DEMO_MODE ? (
+            <>
+              <Link
+                href="/partners"
+                className="px-2 text-xs font-medium text-mid transition-colors hover:text-ink"
+              >
+                For Partners
+              </Link>
+              <div className="flex items-center gap-0.5 rounded-lg bg-bg3 p-0.5">
+                {DEMO_VIEWS.map((v) => (
+                  <Link
+                    key={v.href}
+                    href={v.href}
+                    className="rounded-md px-2.5 py-1.5 text-xs font-medium text-ink2 transition-colors hover:bg-white"
+                  >
+                    {v.label}
+                  </Link>
+                ))}
+              </div>
+            </>
+          ) : user ? (
             <>
               <Link
                 href={dash}
@@ -120,7 +147,20 @@ export function Navbar({ user }: { user: NavUser }) {
               </Link>
             </li>
           </ul>
-          {user ? (
+          {DEMO_MODE ? (
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {DEMO_VIEWS.map((v) => (
+                <Link
+                  key={v.href}
+                  href={v.href}
+                  onClick={() => setOpen(false)}
+                  className={buttonClasses("outline", "sm", "w-full")}
+                >
+                  {v.label}
+                </Link>
+              ))}
+            </div>
+          ) : user ? (
             <div className="mt-3 flex gap-2">
               <Link
                 href={dash}

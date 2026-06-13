@@ -4,6 +4,7 @@ import { z } from "zod";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
+import { DEMO_MODE } from "@/lib/demo";
 import { slugify } from "@/lib/utils";
 
 export type ApplyState = { error?: string } | null;
@@ -40,9 +41,6 @@ export async function submitPartnerApplication(
   _prev: ApplyState,
   formData: FormData,
 ): Promise<ApplyState> {
-  const user = await getCurrentUser();
-  if (!user) return { error: "Please sign in to submit an application." };
-
   const services = formData.getAll("services").map(String).filter(Boolean);
   const parsed = schema.safeParse(Object.fromEntries(formData.entries()));
   if (!parsed.success) {
@@ -51,9 +49,28 @@ export async function submitPartnerApplication(
   const d = parsed.data;
 
   try {
-    if (await db.owner.findUnique({ where: { userId: user.id } })) {
-      return { error: "You already have a partner profile." };
+    let userId: string;
+    if (DEMO_MODE) {
+      // No login required — create a fresh applicant so the application also
+      // shows up for admins to approve, and the demo stays repeatable.
+      let email = (d.contactEmail || "applicant@pepvoga.com").toLowerCase();
+      if (await db.user.findUnique({ where: { email } })) {
+        email = email.replace(/@/, `+${Date.now().toString(36)}@`);
+      }
+      const applicant = await db.user.create({
+        data: { email, name: d.businessName, role: "OWNER" },
+      });
+      userId = applicant.id;
+    } else {
+      const user = await getCurrentUser();
+      if (!user) return { error: "Please sign in to submit an application." };
+      if (await db.owner.findUnique({ where: { userId: user.id } })) {
+        return { error: "You already have a partner profile." };
+      }
+      userId = user.id;
+      await db.user.update({ where: { id: userId }, data: { role: "OWNER" } });
     }
+
     // Ensure a unique slug.
     const base = slugify(d.businessName) || "operator";
     let slug = base;
@@ -62,7 +79,7 @@ export async function submitPartnerApplication(
 
     await db.owner.create({
       data: {
-        userId: user.id,
+        userId,
         businessName: d.businessName,
         slug,
         category: d.category,
@@ -87,7 +104,6 @@ export async function submitPartnerApplication(
         status: "PENDING",
       },
     });
-    await db.user.update({ where: { id: user.id }, data: { role: "OWNER" } });
   } catch {
     return { error: "Could not submit your application. Is the database connected?" };
   }

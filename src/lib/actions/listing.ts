@@ -4,12 +4,8 @@ import { z } from "zod";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/session";
+import { getActingOwner } from "@/lib/session";
 import { slugify, dateOnlyUTC, addDaysUTC } from "@/lib/utils";
-
-async function ownerForUser(userId: string) {
-  return db.owner.findUnique({ where: { userId } });
-}
 
 const lines = (s?: string) =>
   s ? s.split(/[\n,]/).map((x) => x.trim()).filter(Boolean) : [];
@@ -50,9 +46,7 @@ export async function saveListing(
   _prev: ListingFormState,
   formData: FormData,
 ): Promise<ListingFormState> {
-  const user = await getCurrentUser();
-  if (!user) return { error: "Please sign in." };
-  const owner = await ownerForUser(user.id);
+  const owner = await getActingOwner();
   if (!owner) return { error: "No partner profile found." };
 
   const parsed = listingSchema.safeParse(Object.fromEntries(formData.entries()));
@@ -111,9 +105,7 @@ export async function saveListing(
 }
 
 export async function setListingStatus(listingId: string, status: "DRAFT" | "PUBLISHED") {
-  const user = await getCurrentUser();
-  if (!user) return;
-  const owner = await ownerForUser(user.id);
+  const owner = await getActingOwner();
   if (!owner) return;
   await db.listing.updateMany({ where: { id: listingId, ownerId: owner.id }, data: { status } });
   revalidatePath("/owner/listings");
@@ -121,9 +113,7 @@ export async function setListingStatus(listingId: string, status: "DRAFT" | "PUB
 }
 
 export async function deleteListing(listingId: string) {
-  const user = await getCurrentUser();
-  if (!user) return;
-  const owner = await ownerForUser(user.id);
+  const owner = await getActingOwner();
   if (!owner) return;
   // Listings with bookings can't be hard-deleted (records are preserved) — archive instead.
   const bookingCount = await db.booking.count({ where: { listingId } });
@@ -147,9 +137,7 @@ export async function generateAvailability(
   _prev: AvailabilityState,
   formData: FormData,
 ): Promise<AvailabilityState> {
-  const user = await getCurrentUser();
-  if (!user) return { error: "Please sign in." };
-  const owner = await ownerForUser(user.id);
+  const owner = await getActingOwner();
   if (!owner) return { error: "No partner profile found." };
   const listing = await db.listing.findFirst({ where: { id: listingId, ownerId: owner.id } });
   if (!listing) return { error: "Listing not found." };

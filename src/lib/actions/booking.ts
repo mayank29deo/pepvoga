@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/session";
+import { getCurrentUser, getActingOwner } from "@/lib/session";
 import { shortCode, dateOnlyUTC, addDaysUTC } from "@/lib/utils";
 import type { Booking } from "@/generated/prisma/client";
 
@@ -101,10 +101,10 @@ async function restoreOps(b: Booking) {
 }
 
 export async function confirmBooking(bookingId: string) {
-  const user = await getCurrentUser();
-  if (!user) return;
+  const owner = await getActingOwner();
+  if (!owner) return;
   const b = await db.booking.findFirst({
-    where: { id: bookingId, listing: { owner: { userId: user.id } }, status: "PENDING" },
+    where: { id: bookingId, ownerId: owner.id, status: "PENDING" },
   });
   if (!b) return;
   await db.booking.update({ where: { id: b.id }, data: { status: "CONFIRMED", confirmedAt: new Date() } });
@@ -113,10 +113,10 @@ export async function confirmBooking(bookingId: string) {
 }
 
 export async function declineBooking(bookingId: string) {
-  const user = await getCurrentUser();
-  if (!user) return;
+  const owner = await getActingOwner();
+  if (!owner) return;
   const b = await db.booking.findFirst({
-    where: { id: bookingId, listing: { owner: { userId: user.id } }, status: "PENDING" },
+    where: { id: bookingId, ownerId: owner.id, status: "PENDING" },
   });
   if (!b) return;
   const ops = await restoreOps(b);
@@ -129,10 +129,10 @@ export async function declineBooking(bookingId: string) {
 }
 
 export async function completeBooking(bookingId: string) {
-  const user = await getCurrentUser();
-  if (!user) return;
+  const owner = await getActingOwner();
+  if (!owner) return;
   const b = await db.booking.findFirst({
-    where: { id: bookingId, listing: { owner: { userId: user.id } }, status: "CONFIRMED" },
+    where: { id: bookingId, ownerId: owner.id, status: "CONFIRMED" },
   });
   if (!b) return;
   await db.booking.update({ where: { id: b.id }, data: { status: "COMPLETED" } });
