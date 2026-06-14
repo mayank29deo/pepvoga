@@ -3,7 +3,6 @@ import { Star, MapPin, Users, Clock, ShieldCheck } from "lucide-react";
 import { Photo } from "@/components/site/photo";
 import { BookingWidget } from "@/components/site/booking-widget";
 import { getListingBySlug } from "@/lib/data/listings";
-import { getCurrentUser } from "@/lib/session";
 import { fmtDate } from "@/lib/utils";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -14,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ListingPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [listing, user] = await Promise.all([getListingBySlug(slug), getCurrentUser()]);
+  const listing = await getListingBySlug(slug);
   if (!listing) notFound();
 
   const images = listing.images;
@@ -167,14 +166,15 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
         {/* Booking */}
         <aside className="h-fit lg:sticky lg:top-20">
           <BookingWidget
-            listingId={listing.id}
-            slug={listing.slug}
+            title={listing.title}
             type={listing.type}
+            city={listing.city}
+            country={listing.country}
+            host={listing.owner.businessName}
             priceCents={listing.priceCents}
             currency={listing.currency}
             priceUnit={listing.priceUnit}
             minNights={listing.minNights}
-            isLoggedIn={!!user}
             slots={slots}
           />
         </aside>
