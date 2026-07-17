@@ -197,7 +197,7 @@ body {
   overflow: hidden;
   background: var(--color-ink);
   will-change: transform;
-  animation: pvIntroExit 6.6s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+  animation: pvIntroExit 6.9s cubic-bezier(0.76, 0, 0.24, 1) forwards;
 }
 .pv-intro::after {
   content: "";
@@ -216,8 +216,8 @@ body {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transform: scale(1.02);
-  animation: pvFrame 1.1s cubic-bezier(0.33, 0, 0.2, 1) var(--d, 0s) forwards;
+  transform: scale(1.04);
+  animation: pvFrame 1.35s ease-in-out var(--d, 0s) forwards;
 }
 .pv-frame-img {
   position: absolute;
@@ -265,17 +265,18 @@ body {
 @keyframes pvFrame {
   0% {
     opacity: 0;
-    transform: scale(1.02);
+    transform: scale(1.04);
   }
-  20% {
+  38% {
     opacity: 1;
   }
-  72% {
+  70% {
     opacity: 1;
+    transform: scale(1.09);
   }
   100% {
     opacity: 0;
-    transform: scale(1.1);
+    transform: scale(1.13);
   }
 }
 
@@ -293,7 +294,7 @@ body {
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.4);
   opacity: 0;
-  animation: pvIntroFade 0.8s ease 3.8s forwards;
+  animation: pvIntroFade 0.8s ease 4s forwards;
 }
 .pv-intro-mask {
   display: block;
@@ -309,7 +310,7 @@ body {
   letter-spacing: -0.05em;
   color: #fff;
   transform: translateY(115%);
-  animation: pvIntroWord 1s cubic-bezier(0.16, 1, 0.3, 1) 4.05s forwards;
+  animation: pvIntroWord 1s cubic-bezier(0.16, 1, 0.3, 1) 4.3s forwards;
 }
 .pv-intro-line {
   display: block;
@@ -319,7 +320,7 @@ body {
   background: var(--color-accent);
   transform: scaleX(0);
   transform-origin: center;
-  animation: pvIntroLine 0.7s cubic-bezier(0.16, 1, 0.3, 1) 4.45s forwards;
+  animation: pvIntroLine 0.7s cubic-bezier(0.16, 1, 0.3, 1) 4.7s forwards;
 }
 .pv-intro-sub {
   display: block;
@@ -330,11 +331,11 @@ body {
   color: rgba(255, 255, 255, 0.78);
   opacity: 0;
   transform: translateY(12px);
-  animation: pvIntroFadeUp 0.7s ease 4.75s forwards;
+  animation: pvIntroFadeUp 0.7s ease 5s forwards;
 }
 @keyframes pvIntroExit {
   0%,
-  88% {
+  87% {
     transform: translateY(0);
   }
   100% {
@@ -413,27 +414,27 @@ body {
   object-fit: cover;
   opacity: 0;
   filter: grayscale(0.15) saturate(1.1) contrast(1.04) brightness(0.6);
-  animation: phReel 18s ease-in-out infinite;
+  animation: phReel 24s ease-in-out infinite;
   will-change: opacity, transform;
 }
 @keyframes phReel {
   0% {
     opacity: 0;
-    transform: scale(1.04);
+    transform: scale(1.05);
   }
-  4% {
+  5% {
     opacity: 1;
   }
-  16.6% {
+  16.7% {
     opacity: 1;
-    transform: scale(1.1);
+    transform: scale(1.12);
   }
-  20.6% {
+  22% {
     opacity: 0;
   }
   100% {
     opacity: 0;
-    transform: scale(1.04);
+    transform: scale(1.05);
   }
 }
 @media (prefers-reduced-motion: reduce) {

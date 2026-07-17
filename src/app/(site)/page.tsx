@@ -12,10 +12,10 @@ const HERO =
 
 const MOSAIC = [
   { img: "https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=1000&q=80", label: "Rock Climbing", span: true },
-  { img: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=800&q=80", label: "Scuba Diving" },
-  { img: "https://images.unsplash.com/photo-1503220317375-aaad61436b1b?auto=format&fit=crop&w=800&q=80", label: "Paragliding" },
+  { img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80", label: "Scuba Diving" },
+  { img: "https://images.unsplash.com/photo-1471247511763-88a722fc9919?auto=format&fit=crop&w=800&q=80", label: "Paragliding" },
   { img: "https://images.unsplash.com/photo-1455264745730-cb3b76250ae8?auto=format&fit=crop&w=800&q=80", label: "Surfing" },
-  { img: "https://images.unsplash.com/photo-1483721310020-03333e577078?auto=format&fit=crop&w=800&q=80", label: "Expedition Cycling" },
+  { img: "https://images.unsplash.com/photo-1471506480208-91b3a4cc78be?auto=format&fit=crop&w=800&q=80", label: "Expedition Cycling" },
 ];
 
 const PERKS = [

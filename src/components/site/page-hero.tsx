@@ -42,7 +42,7 @@ export function PageHero({
               src={src}
               alt=""
               className="ph-reel-img"
-              style={{ animationDelay: `${-i * 3}s` }}
+              style={{ animationDelay: `${-i * 4}s` }}
               draggable={false}
             />
           ))}
