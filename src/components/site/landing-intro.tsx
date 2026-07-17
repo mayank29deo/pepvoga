@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // A cinematic, session-once intro: a fast montage of adventure niches
 // (TREK → SURF → DIVE → CLIMB → FLY → RIDE) with full-bleed imagery flashes by,
 // then resolves into the PEPVOGA wordmark + tagline, and the panel lifts away to
-// the hero. "One home for every kind of adventure." Respects reduced-motion.
+// the hero. Skippable (button or Esc). Respects reduced-motion.
 const REEL = [
   { word: "TREK", place: "Himalayas", img: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1600&q=75" },
   { word: "SURF", place: "Uluwatu", img: "https://images.unsplash.com/photo-1455264745730-cb3b76250ae8?auto=format&fit=crop&w=1600&q=75" },
@@ -17,6 +17,13 @@ const REEL = [
 
 export function LandingIntro() {
   const [show, setShow] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const dismiss = useCallback(() => {
+    if (timer.current) clearTimeout(timer.current);
+    setShow(false);
+    document.body.style.overflow = "";
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -25,21 +32,23 @@ export function LandingIntro() {
     sessionStorage.setItem("pv-intro-shown", "1");
     setShow(true);
     document.body.style.overflow = "hidden";
-    const t = setTimeout(() => {
-      setShow(false);
-      document.body.style.overflow = "";
-    }, 6650);
+    timer.current = setTimeout(dismiss, 6650);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") dismiss();
+    };
+    window.addEventListener("keydown", onKey);
     return () => {
-      clearTimeout(t);
+      if (timer.current) clearTimeout(timer.current);
+      window.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, []);
+  }, [dismiss]);
 
   if (!show) return null;
 
   return (
-    <div className="pv-intro" aria-hidden>
-      <div className="pv-reel">
+    <div className="pv-intro">
+      <div className="pv-reel" aria-hidden>
         {REEL.map((f, i) => (
           <div
             key={f.word}
@@ -57,7 +66,7 @@ export function LandingIntro() {
         ))}
       </div>
 
-      <div className="pv-intro-inner">
+      <div className="pv-intro-inner" aria-hidden>
         <span className="pv-intro-coord">28°36′N · 77°12′E · ALT 216 M</span>
         <span className="pv-intro-mask">
           <span className="pv-intro-word">PEPVOGA</span>
@@ -65,6 +74,10 @@ export function LandingIntro() {
         <span className="pv-intro-line" />
         <span className="pv-intro-sub">Every adventure. One home for the untamed.</span>
       </div>
+
+      <button type="button" onClick={dismiss} className="pv-intro-skip" aria-label="Skip intro">
+        Skip <span aria-hidden>→</span>
+      </button>
     </div>
   );
 }
