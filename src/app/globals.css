@@ -197,7 +197,7 @@ body {
   overflow: hidden;
   background: var(--color-ink);
   will-change: transform;
-  animation: pvIntroExit 6.9s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+  animation: pvIntroExit 8.5s cubic-bezier(0.76, 0, 0.24, 1) forwards;
 }
 .pv-intro::after {
   content: "";
@@ -217,7 +217,7 @@ body {
   inset: 0;
   opacity: 0;
   transform: scale(1.04);
-  animation: pvFrame 1.35s ease-in-out var(--d, 0s) forwards;
+  animation: pvFrame 1.55s ease-in-out var(--d, 0s) forwards;
 }
 .pv-frame-img {
   position: absolute;
@@ -267,16 +267,16 @@ body {
     opacity: 0;
     transform: scale(1.04);
   }
-  38% {
+  28% {
     opacity: 1;
   }
-  70% {
+  76% {
     opacity: 1;
-    transform: scale(1.09);
+    transform: scale(1.1);
   }
   100% {
     opacity: 0;
-    transform: scale(1.13);
+    transform: scale(1.14);
   }
 }
 
@@ -294,7 +294,7 @@ body {
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.4);
   opacity: 0;
-  animation: pvIntroFade 0.8s ease 4s forwards;
+  animation: pvIntroFade 0.8s ease 5.5s forwards;
 }
 .pv-intro-mask {
   display: block;
@@ -310,7 +310,7 @@ body {
   letter-spacing: -0.05em;
   color: #fff;
   transform: translateY(115%);
-  animation: pvIntroWord 1s cubic-bezier(0.16, 1, 0.3, 1) 4.3s forwards;
+  animation: pvIntroWord 1s cubic-bezier(0.16, 1, 0.3, 1) 5.8s forwards;
 }
 .pv-intro-line {
   display: block;
@@ -320,7 +320,7 @@ body {
   background: var(--color-accent);
   transform: scaleX(0);
   transform-origin: center;
-  animation: pvIntroLine 0.7s cubic-bezier(0.16, 1, 0.3, 1) 4.7s forwards;
+  animation: pvIntroLine 0.7s cubic-bezier(0.16, 1, 0.3, 1) 6.2s forwards;
 }
 .pv-intro-sub {
   display: block;
@@ -331,11 +331,11 @@ body {
   color: rgba(255, 255, 255, 0.78);
   opacity: 0;
   transform: translateY(12px);
-  animation: pvIntroFadeUp 0.7s ease 5s forwards;
+  animation: pvIntroFadeUp 0.7s ease 6.5s forwards;
 }
 @keyframes pvIntroExit {
   0%,
-  87% {
+  90% {
     transform: translateY(0);
   }
   100% {

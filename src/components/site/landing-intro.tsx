@@ -32,7 +32,7 @@ export function LandingIntro() {
     sessionStorage.setItem("pv-intro-shown", "1");
     setShow(true);
     document.body.style.overflow = "hidden";
-    timer.current = setTimeout(dismiss, 6950);
+    timer.current = setTimeout(dismiss, 8550);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") dismiss();
     };
@@ -53,7 +53,7 @@ export function LandingIntro() {
           <div
             key={f.word}
             className="pv-frame"
-            style={{ "--d": `${(0.3 + i * 0.52).toFixed(2)}s` } as React.CSSProperties}
+            style={{ "--d": `${(0.3 + i * 0.8).toFixed(2)}s` } as React.CSSProperties}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={f.img} alt="" className="pv-frame-img" draggable={false} />
