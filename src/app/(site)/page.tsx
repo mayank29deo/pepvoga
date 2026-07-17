@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Photo } from "@/components/site/photo";
 import { Reveal } from "@/components/site/reveal";
 import { NewsletterForm } from "@/components/site/newsletter-form";
+import { LandingIntro } from "@/components/site/landing-intro";
 import { buttonClasses } from "@/components/ui/button";
 import { STATS, TICKER, DESTINATIONS, SITE } from "@/lib/content";
 
@@ -29,6 +30,8 @@ const PARTNER_TAGS = ["Dive Operators", "Surf Schools", "Climbing Gyms", "Advent
 export default function HomePage() {
   return (
     <>
+      <LandingIntro />
+
       {/* ───────── Hero ───────── */}
       <section className="relative flex min-h-[90vh] flex-col justify-end overflow-hidden px-6 pb-16 pt-28 sm:px-12">
         <Photo src={HERO} alt="Mountain landscape at altitude" priority />

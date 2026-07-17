@@ -185,3 +185,113 @@ body {
   opacity: 1;
   transform: none;
 }
+
+/* ─────────────────── Landing intro (once per session) ─────────────────── */
+.pv-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--color-ink);
+  will-change: transform;
+  animation: pvIntroExit 2.7s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+.pv-intro::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+}
+.pv-intro-inner {
+  position: relative;
+  z-index: 1;
+  padding: 0 24px;
+  text-align: center;
+}
+.pv-intro-coord {
+  display: block;
+  margin-bottom: 22px;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  opacity: 0;
+  animation: pvIntroFade 0.8s ease 0.15s forwards;
+}
+.pv-intro-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+}
+.pv-intro-word {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(3rem, 14vw, 10rem);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  color: #fff;
+  transform: translateY(115%);
+  animation: pvIntroWord 1s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards;
+}
+.pv-intro-line {
+  display: block;
+  height: 2px;
+  width: min(56vw, 300px);
+  margin: 22px auto 0;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: center;
+  animation: pvIntroLine 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.65s forwards;
+}
+.pv-intro-sub {
+  display: block;
+  margin-top: 20px;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(0.9rem, 2vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.78);
+  opacity: 0;
+  transform: translateY(12px);
+  animation: pvIntroFadeUp 0.7s ease 0.9s forwards;
+}
+@keyframes pvIntroExit {
+  0%,
+  76% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-102%);
+  }
+}
+@keyframes pvIntroWord {
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes pvIntroLine {
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes pvIntroFade {
+  to {
+    opacity: 0.4;
+  }
+}
+@keyframes pvIntroFadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pv-intro {
+    display: none;
+  }
+}
